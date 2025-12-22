@@ -3,339 +3,171 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <meta name="theme-color" content="#0b0b0f"/>
-  <title>FibreOS Prototype v2.5</title>
+  <meta name="theme-color" content="#0a0a10"/>
+  <title>FibreOS Clean v2.9</title>
   <link rel="manifest" href="manifest.json"/>
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 <div id="app" class="app">
+  <div class="bg" aria-hidden="true"></div>
 
-  <!-- AOD -->
-  <section id="aod" class="screen aod hidden" aria-hidden="true">
-    <div class="wall dim"></div>
-    <div class="aodStack">
-      <div class="aodTime" data-aod-time>00:00</div>
-      <div class="aodMeta">
-        <div class="aodDate" data-aod-date>Mon 22 Dec</div>
-        <div class="aodWeather"><span data-aod-desc>Cloudy</span> <span class="sep">•</span> <span data-aod-temp>7°</span></div>
-      </div>
-    </div>
-    <div class="aodHint">Tap to wake</div>
-  </section>
-
-  <!-- LOCK -->
-  <section id="lock" class="screen lock hidden" aria-hidden="true">
-    <div class="wall blur dim"></div>
-
-    <header class="sysbar">
-      <div class="sysL"><span data-sys-time>00:00</span></div>
-      <div class="sysR"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div>
-    </header>
-
-    <div class="lockHud">
-      <div class="lockClock">
-        <div class="hh" data-lock-hh>00</div>
-        <div class="mm" data-lock-mm>00</div>
-      </div>
-      <div class="lockRight">
-        <div class="lockDay" data-lock-day>Monday</div>
-        <div class="lockMonth"><span data-lock-month>December</span> <span class="num" data-lock-date>22</span></div>
-        <div class="lockWeatherRow">
-          <div class="desc" data-lock-desc>Cloudy</div>
-          <div class="range"><span data-lock-hi>9°</span> • <span data-lock-lo>7°</span></div>
-          <div class="now" data-lock-now>7°</div>
+  <main id="content" class="content">
+    <!-- HOME -->
+    <section id="home" class="screen is-active" aria-label="Home">
+      <div class="hero">
+        <div class="heroClock">
+          <div class="hh" data-hh>00</div>
+          <div class="mm" data-mm>00</div>
         </div>
-      </div>
-    </div>
-
-    <!-- Lock actions -->
-    <div class="lockActions">
-      <button class="miniBtn" id="lockNotifs" aria-label="Notifications">🔔</button>
-      <button class="miniBtn" id="lockQS" aria-label="Quick settings">⚙️</button>
-    </div>
-
-    <!-- PIN -->
-    <div class="pinWrap" id="pinWrap">
-      <div class="pinTitle">Enter PIN</div>
-      <div class="pinDots" id="pinDots">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      </div>
-      <div class="pinPad" id="pinPad"></div>
-      <div class="pinMsg" id="pinMsg"></div>
-    </div>
-
-    <div class="cornerZone left" aria-label="Notifications corner"></div>
-    <div class="cornerZone right" aria-label="Quick settings corner"></div>
-
-    <div class="homeIndicator"></div>
-  </section>
-
-  <!-- HOME -->
-  <section id="home" class="screen home" aria-hidden="false">
-    <div class="wallpaper"></div>
-
-    <header class="sysbar">
-      <div class="sysL"><span data-sys-time>00:00</span></div>
-      <div class="sysR"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div>
-    </header>
-
-    <!-- Home quick icons -->
-    <div class="homeQuick">
-      <button class="miniBtn" id="homeLock" aria-label="Lock">🔒</button>
-      <button class="miniBtn" id="homeNotifs" aria-label="Notifications">🔔</button>
-      <button class="miniBtn" id="homeQS" aria-label="Quick settings">⚙️</button>
-    </div>
-
-    <div class="hud">
-      <div class="clockBig">
-        <div class="h" data-home-hh>00</div>
-        <div class="m" data-home-mm>00</div>
-      </div>
-      <div class="hudRight">
-        <div class="day" data-home-day>Monday</div>
-        <div class="monthRow"><span class="month" data-home-month>December</span> <span class="dateNum" data-home-date>22</span></div>
-        <div class="weatherRow">
-          <div class="wMain" data-home-desc>Cloudy</div>
-          <div class="wRange"><span data-home-hi>9°</span> • <span data-home-lo>7°</span></div>
-          <div class="wNow" data-home-now>7°</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="homeWidgets">
-      <div class="wTile media" id="homeMediaTile">
-        <div class="thumb"></div>
-        <div class="wText">
-          <div class="wTitle" data-media-title>Christmas</div>
-          <div class="wTitle" data-media-sub>Market Fun</div>
-          <div class="wSub"><span class="play">▶</span> <span data-media-year>2025</span></div>
+        <div class="heroMeta">
+          <div class="day" data-day>Monday</div>
+          <div class="monthRow"><span class="month" data-month>December</span> <span class="date" data-date>22</span></div>
+          <div class="weatherRow">
+            <div class="tempNow"><span data-now>7</span>°</div>
+            <div class="descBlock">
+              <div class="desc" data-desc>Overcast</div>
+              <div class="range"><span data-hi>9</span>° • <span data-lo>7</span>°</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="wTile pillGrad"></div>
+      <div class="homeGrid">
+        <div class="tile big">
+          <div class="tileInner dark">
+            <div class="tileTitle">Christmas<br/>Market Fun</div>
+            <div class="tileSub">▶ 2025</div>
+          </div>
+        </div>
 
-      <div class="wActions">
-        <button class="fab orange" id="btnSearch" aria-label="Search">🔎</button>
-        <button class="fab blue" id="btnConnect" aria-label="Connect">✉️</button>
+        <div class="tile big grad"></div>
+
+        <div class="tile wide agenda">
+          <div class="agendaHead" data-agenda>Monday 22nd December</div>
+          <div class="agendaBody" id="agendaList"></div>
+          <button class="agendaAdd" title="Add">+</button>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="agenda">
-      <div class="agendaHead" data-agenda-title>Monday 22nd December</div>
-      <div class="agendaBody" id="agendaList"></div>
-      <button class="agendaAdd" id="agendaAdd">+</button>
-    </div>
+    <!-- MUSIC -->
+    <section id="music" class="screen" aria-label="Music">
+      <div class="musicHeader">
+        <div class="musicTitle">Music</div>
+        <div class="musicSub">For You • Music • Podcasts</div>
+      </div>
+      <div id="musicGrid" class="musicGrid"></div>
+      <div class="nowPlaying">
+        <div class="npArt" id="npArt"></div>
+        <div class="npText">
+          <div class="npTitle">Last Christmas</div>
+          <div class="npArtist">Wham!</div>
+        </div>
+        <div class="npBtns">
+          <button class="npBtn">⏮</button>
+          <button class="npBtn npPlay">⏸</button>
+          <button class="npBtn">⏭</button>
+        </div>
+      </div>
+      <div class="musicSearchRow">
+        <input class="musicInput" id="musicInput" placeholder="Search Music" autocomplete="off"/>
+      </div>
+    </section>
 
-    <div class="homeDock" id="homeDock"></div>
+    <!-- LOCK -->
+    <section id="lock" class="screen" aria-label="Lock screen">
+      <div class="lockBackdrop"></div>
+      <div class="lockLayout">
+        <div class="hero lockHero">
+          <div class="heroClock">
+            <div class="hh" data-hh>00</div>
+            <div class="mm" data-mm>00</div>
+          </div>
+          <div class="heroMeta">
+            <div class="day" data-day>Monday</div>
+            <div class="monthRow"><span class="month" data-month>December</span> <span class="date" data-date>22</span></div>
+            <div class="weatherRow">
+              <div class="tempNow"><span data-now>7</span>°</div>
+              <div class="descBlock">
+                <div class="desc" data-desc>Overcast</div>
+                <div class="range"><span data-hi>9</span>° • <span data-lo>7</span>°</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <button class="homeSearch" id="homeSearch">
-      <span class="magnify">🔍</span>
-      <span class="txt">Search Everything</span>
-    </button>
+        <div class="pinWrap">
+          <div class="pinTitle">Enter PIN</div>
+          <div class="pinDots" id="pinDots">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <div class="pinPad" id="pinPad"></div>
+          <div class="pinMsg" id="pinMsg"></div>
+        </div>
+      </div>
+    </section>
 
-    <div class="homeIndicator"></div>
-  </section>
+    <!-- AOD -->
+    <section id="aod" class="screen" aria-label="Always on display">
+      <div class="aodBlack"></div>
+      <div class="lockLayout aodScale">
+        <div class="hero lockHero">
+          <div class="heroClock">
+            <div class="hh" data-hh>00</div>
+            <div class="mm" data-mm>00</div>
+          </div>
+          <div class="heroMeta">
+            <div class="day" data-day>Monday</div>
+            <div class="monthRow"><span class="month" data-month>December</span> <span class="date" data-date>22</span></div>
+            <div class="weatherRow">
+              <div class="tempNow"><span data-now>7</span>°</div>
+              <div class="descBlock">
+                <div class="desc" data-desc>Overcast</div>
+                <div class="range"><span data-hi>9</span>° • <span data-lo>7</span>°</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="aodHint">Tap to wake</div>
+      </div>
+    </section>
+  </main>
 
-  <!-- DRAWER -->
-  <section id="drawer" class="screen panel hidden" aria-hidden="true">
-    <header class="sysbar">
-      <div class="sysL"><span data-sys-time>00:00</span></div>
-      <div class="sysR"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div>
-    </header>
-
-    <div class="panelHead">
-      <div class="title">Apps</div>
-      <div class="sub">Swipe down to return</div>
-    </div>
-    <div class="drawerPinned" id="drawerPinned"></div>
-    <div class="drawerGrid" id="drawerGrid"></div>
-    <div class="homeIndicator"></div>
-  </section>
-
-  <!-- WIDGETS -->
-  <section id="widgets" class="screen panel hidden" aria-hidden="true">
-    <header class="sysbar">
-      <div class="sysL"><span data-sys-time>00:00</span></div>
-      <div class="sysR"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div>
-    </header>
-
-    <div class="panelHead">
-      <div class="title">Widget Hub</div>
-      <div class="sub">Swipe left to return • Tap to add</div>
-    </div>
-    <div class="list scroll" id="widgetList"></div>
-    <div class="homeIndicator"></div>
-  </section>
-
-  <!-- CONNECT -->
-  <section id="connect" class="screen panel hidden" aria-hidden="true">
-    <header class="sysbar">
-      <div class="sysL"><span data-sys-time>00:00</span></div>
-      <div class="sysR"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div>
-    </header>
-
-    <div class="panelHead">
-      <div class="title">Connect Hub</div>
-      <div class="sub">Unified inbox • Swipe right to return</div>
-    </div>
-    <div class="list scroll" id="connectList"></div>
-    <div class="homeIndicator"></div>
-  </section>
-
-  <!-- OVERVIEW -->
-  <section id="overview" class="screen panel hidden" aria-hidden="true">
-    <header class="sysbar">
-      <div class="sysL"><span data-sys-time>00:00</span></div>
-      <div class="sysR"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div>
-    </header>
-
-    <div class="panelHead">
-      <div class="title">Overview</div>
-      <div class="sub">Swipe up to close • Swipe left/right for Spaces</div>
-    </div>
-    <div class="spaces" id="spacesStrip"></div>
-    <div class="cards scroll" id="recentCards"></div>
-    <div class="homeIndicator"></div>
-  </section>
-
-  <!-- MUSIC -->
-  <section id="music" class="screen music hidden" aria-hidden="true">
-    <div class="musicBg"></div>
-
-    <header class="sysbar" style="pointer-events:none">
-      <div class="sysL"><span data-sys-time>00:00</span></div>
-      <div class="sysR"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div>
-    </header>
-
-    <div class="musicGrid scroll" id="musicGrid"></div>
-
-    <div class="musicBar">
-      <button class="mCircle mint" id="musicMenuBtn" aria-label="Music menu">≡</button>
-      <button class="mSearch" id="musicSearchBtn" aria-label="Search Music">
-        <span class="mIcon">🔍</span>
-        <span class="mHint">Search Music</span>
+  <!-- FIXED FIBRE CAPSULE -->
+  <footer id="capsule" class="capsule" aria-label="Fibre capsule">
+    <div class="capTop">
+      <button id="menuBtn" class="capMenu" aria-label="Menu">
+        <span class="menuGlyph">≡</span>
+      </button>
+      <button id="capSearch" class="capSearch" aria-label="Search">
+        <span class="mag">🔍</span>
+        <span class="label" id="capSearchLabel">Search Everything</span>
       </button>
     </div>
 
-    <div class="musicNav hidden" id="musicNav">
-      <div class="navRow">
-        <button class="mCircle mint" id="musicCloseNav" aria-label="Close">✕</button>
-        <button class="mSearch wide" id="musicSearchBtn2">
-          <span class="mIcon">🔍</span>
-          <span class="mHint">Search Music</span>
-        </button>
-      </div>
-      <div class="tabs" id="musicTabs"></div>
-    </div>
-
-    <div class="nowPlaying" id="nowPlaying">
-      <div class="art" id="npArt"></div>
-      <div class="npText">
-        <div class="npTitle" id="npTitle">Last Christmas</div>
-        <div class="npArtist" id="npArtist">Wham!</div>
-      </div>
-      <div class="npControls">
-        <button class="npBtn" id="prevBtn">⏮</button>
-        <button class="npBtn" id="playBtn">⏸</button>
-        <button class="npBtn" id="nextBtn">⏭</button>
+    <div class="capBottom">
+      <div class="capTime" id="capTime">00:00</div>
+      <div class="homeBar" aria-hidden="true"></div>
+      <div class="capStatus">
+        <span class="ico cell" title="Cell"></span>
+        <span class="ico wifi" title="Wi-Fi"></span>
+        <span class="battery" title="Battery">
+          <span class="batIcon"><span class="batFill" id="batFill"></span></span>
+          <span class="batPct" id="batPct">--%</span>
+        </span>
       </div>
     </div>
 
-    <div class="player hidden" id="player">
-      <div class="playerTop">
-        <button class="pillBtn" id="playerClose">Close</button>
-        <div class="pTitle">Now Playing</div>
-        <div style="width:72px"></div>
-      </div>
-      <div class="playerArt" id="playerArt"></div>
-      <div class="playerMeta">
-        <div class="big" id="pTrack">Last Christmas</div>
-        <div class="sub2" id="pArtist">Wham!</div>
-      </div>
-      <div class="seek">
-        <input id="seek" type="range" min="0" max="100" value="25"/>
-        <div class="seekRow"><span id="tCur">0:58</span><span id="tEnd">3:52</span></div>
-      </div>
-      <div class="playerControls">
-        <button class="ctl" id="pPrev">⏮</button>
-        <button class="ctl bigCtl" id="pPlay">⏸</button>
-        <button class="ctl" id="pNext">⏭</button>
-      </div>
-      <div class="queue" id="queue"></div>
+    <div id="menuSheet" class="menuSheet hidden">
+      <button class="appIcon" data-go="home"><span class="glyph">🏠</span><span class="txt">Home</span></button>
+      <button class="appIcon" data-go="music"><span class="glyph">🎵</span><span class="txt">Music</span></button>
+      <button class="appIcon" data-go="lock"><span class="glyph">🔒</span><span class="txt">Lock</span></button>
     </div>
-
-    <div class="musicSearch hidden" id="musicSearch">
-      <div class="musicSearchTop">
-        <button class="mCircle mint" id="musicBackSearch" aria-label="Back">←</button>
-        <div class="mSearch wide active">
-          <span class="mIcon">🔍</span>
-          <span class="mCursor">|</span>
-          <span class="mHint faint" id="musicSearchPh">Search Music</span>
-          <span class="mValue" id="musicQuery"></span>
-        </div>
-      </div>
-      <div class="searchResults scroll" id="musicResults"></div>
-      <div class="kbd">
-        <div class="kbdRow" data-row="1"></div>
-        <div class="kbdRow" data-row="2"></div>
-        <div class="kbdRow" data-row="3"></div>
-        <div class="kbdBottom">
-          <button class="kKey wide" data-key="sym">sym</button>
-          <button class="kKey space" data-key="space">space</button>
-          <button class="kKey wide" data-key=".">.</button>
-          <button class="kKey wide" data-key="search">search</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="homeIndicator"></div>
-  </section>
-
-  <!-- SEARCH EVERYTHING -->
-  <section id="search" class="screen search hidden" aria-hidden="true">
-    <div class="searchBg"></div>
-    <header class="sysbar">
-      <div class="sysL"><span data-sys-time>00:00</span></div>
-      <div class="sysR"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div>
-    </header>
-
-    <div class="searchResultsWrap scroll" id="globalResults"></div>
-
-    <div class="searchBar">
-      <button class="pillSmall" id="scopeBtn">Global</button>
-      <input id="globalInput" placeholder="Search everything" autocomplete="off"/>
-      <button class="pillSmall" id="closeSearch">Close</button>
-    </div>
-
-    <div class="homeIndicator"></div>
-  </section>
-
-  <!-- NOTIFICATIONS SHADE -->
-  <aside id="notifs" class="shade hidden" aria-hidden="true">
-    <div class="shadeHead">Notifications</div>
-    <div class="shadeBody scroll" id="notifList"></div>
-    <div class="shadeFoot">Swipe down to close</div>
-  </aside>
-
-  <!-- QUICK SETTINGS -->
-  <aside id="qs" class="shade hidden" aria-hidden="true">
-    <div class="shadeHead">Quick Settings</div>
-    <div class="shadeBody scroll" id="qsList"></div>
-    <div class="shadeFoot">Swipe down to close</div>
-  </aside>
-
-  <!-- SYSTEM MENU -->
-  <aside id="sysMenu" class="sysMenu hidden" aria-hidden="true">
-    <div class="sysMenuCard">
-      <div class="sysMenuTitle">System</div>
-      <div class="sysIconRow" id="sysIconRow"></div>
-      <button class="sysClose" id="sysClose">Close</button>
-    </div>
-  </aside>
-
+  </footer>
 </div>
 
+<script>window.__COVERS__ = ["assets/cover_00.png", "assets/cover_01.png", "assets/cover_02.png", "assets/cover_03.png", "assets/cover_04.png", "assets/cover_05.png", "assets/cover_06.png", "assets/cover_07.png", "assets/cover_08.png", "assets/cover_09.png", "assets/cover_10.png", "assets/cover_11.png", "assets/cover_12.png", "assets/cover_13.png", "assets/cover_14.png", "assets/cover_15.png"];</script>
 <script src="app.js"></script>
 </body>
 </html>
