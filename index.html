@@ -1,227 +1,366 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <meta name="theme-color" content="#0b0b0f"/>
-  <title>FibreOS Prototype v2.2</title>
-  <link rel="manifest" href="manifest.json"/>
-  <link rel="stylesheet" href="styles.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>FibreOS Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div id="appShell">
+  <div id="app" class="app-root">
+    <div id="capsule" class="capsule" aria-label="Fibre capsule">
+      <!-- Spaces: Home + Widget Hub -->
+      <div id="spaces" class="spaces" aria-label="Spaces">
+        <!-- HOME -->
+        <section class="screen home" data-screen="home">
+          <div class="home-bg"></div>
 
-  <!-- "Fibre capsule" (keeps same size on unfolded Pixel Fold) -->
-  <div id="capsule" class="capsule">
-    <div id="debug" class="debug">home</div>
+          <!-- Clock/Date/Weather free-float block -->
+          <div class="clock-widget" id="clockWidget" aria-label="Clock widget">
+            <div class="time-grid" aria-label="Time">
+              <div class="digit" id="t_h1">1</div>
+              <div class="digit" id="t_h2">1</div>
+              <div class="digit heavy" id="t_m1">0</div>
+              <div class="digit heavy" id="t_m2">5</div>
+            </div>
 
-    <!-- System status bar -->
-    <header class="sysbar" id="sysbar" aria-label="System status bar">
-      <div class="sys-left">
-        <span class="sys-time" data-time>19:06</span>
+            <div class="date-weather">
+              <div class="date-block">
+                <div class="dw-left">
+                  <div class="dw-line" id="dw_weekday">Friday</div>
+                  <div class="dw-line" id="dw_month">December</div>
+                </div>
+                <div class="dw-right" id="dw_day">19</div>
+              </div>
+
+              <div class="weather-block">
+                <div class="dw-left">
+                  <div class="dw-line" id="wx_desc">Cloudy</div>
+                  <div class="dw-line" id="wx_range">8° • 5°</div>
+                </div>
+                <div class="dw-right" id="wx_temp">8°</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Photo widget -->
+          <div class="photo-widget">
+            <div class="photo-scrim"></div>
+            <div class="photo-caption">
+              <div class="photo-title">Christmas Market Fun</div>
+              <div class="photo-sub">‣ 2025</div>
+            </div>
+          </div>
+
+          <!-- Calendar widget -->
+          <div class="calendar-widget scrollable" aria-label="Calendar widget">
+            <div class="cal-header" id="calHeader">Tuesday 16th December</div>
+            <div class="cal-item"><strong>No events today</strong></div>
+            <div class="cal-item"><strong>Tomorrow, 09:00 - 10:00:</strong> DPD Delivery Expected</div>
+            <div class="cal-item"><strong>Friday, 09:00 - 17:30:</strong> Lia @ Work</div>
+            <div class="cal-item"><strong>Saturday, 09:00 - 14:30:</strong> Lia @ Work</div>
+            <button class="cal-action" aria-label="Calendar action">+</button>
+          </div>
+
+          <!-- Some app icons and a placeholder widget -->
+          <button class="app-tile app-mail" data-open="connect" aria-label="Mail (dummy)">
+            <img src="assets/icons/mail.png" alt="" />
+          </button>
+          <button class="app-tile app-browser" data-open="browser" aria-label="Browser (dummy)">
+            <img src="assets/icons/browser.png" alt="" />
+          </button>
+
+          <div class="wide-widget" aria-hidden="true"></div>
+
+          <!-- Pinned apps row -->
+          <div class="pinned-row" aria-label="Pinned apps">
+            <button class="icon-pill" data-open="music" aria-label="Music">
+              <img src="assets/icons/music.png" alt="" />
+            </button>
+            <button class="icon-pill" data-open="home" aria-label="Home">
+              <img src="assets/icons/widgets.png" alt="" />
+            </button>
+            <button class="icon-pill" data-open="photos" aria-label="Photos">
+              <img src="assets/icons/photos.png" alt="" />
+            </button>
+            <button class="icon-pill" data-open="camera" aria-label="Camera">
+              <img src="assets/icons/camera.png" alt="" />
+            </button>
+          </div>
+
+          <!-- System App Bar (home theme) -->
+          <div class="sys-appbar theme-home" aria-label="System app bar">
+            <button class="menu-btn" id="sysMenuBtn" data-open-menu="system" aria-label="System menu">
+              <span class="menu-lines"></span>
+            </button>
+            <button class="search-pill" id="globalSearchBtn" aria-label="Search Everything">
+              <span class="magnifier"></span>
+              <span>Search Everything</span>
+            </button>
+          </div>
+
+          <!-- System Status Bar (bottom) -->
+          <footer class="sys-status" aria-label="System status bar">
+            <div class="sys-time" id="sysTime">15:16</div>
+            <div class="home-dots" aria-hidden="true">
+              <span class="dot" data-dot="left"></span>
+              <span class="bar"></span>
+              <span class="dot" data-dot="right"></span>
+              <span class="dot v" data-dot="top"></span>
+              <span class="dot v" data-dot="bottom"></span>
+            </div>
+            <div class="sys-icons" aria-hidden="true">
+              <span class="icon cell"></span>
+              <span class="icon wifi"></span>
+              <span class="icon batt"></span>
+            </div>
+          </footer>
+        </section>
+
+        <!-- WIDGET HUB SPACE -->
+        <section class="screen widgethub" data-screen="widgethub">
+          <div class="home-bg"></div>
+          <div class="widgethub-header">
+            <div class="wh-title">Widget Hub</div>
+            <div class="wh-sub">Swipe left to return</div>
+          </div>
+
+          <div class="hub-list scrollable">
+            <div class="hub-card">
+              <div class="hub-card-title">Suggested Widgets</div>
+              <div class="hub-card-body">Calendar • Photos • Weather • Music • Reminders</div>
+            </div>
+
+            <button class="hub-card tappable" data-open="connect" aria-label="Open Connect Hub">
+              <div class="hub-card-title">Connect Hub</div>
+              <div class="hub-card-body">Unified inbox • Calls • Events • Shared files</div>
+            </button>
+
+            <div class="hub-card">
+              <div class="hub-card-title">Home Customisation</div>
+              <div class="hub-card-body">Hold anywhere on Home to enter edit mode. (Prototype: coming next)</div>
+            </div>
+
+            <div class="hub-card">
+              <div class="hub-card-title">Privacy + Permissions</div>
+              <div class="hub-card-body">Per-app + per-plugin toggles. Connect Hub only pulls what you allow.</div>
+            </div>
+          </div>
+
+          <div class="sys-appbar theme-home" aria-label="System app bar">
+            <button class="menu-btn" aria-label="System menu" data-open-menu="system">
+              <span class="menu-lines"></span>
+            </button>
+            <button class="search-pill" aria-label="Search Everything" id="globalSearchBtn2">
+              <span class="magnifier"></span>
+              <span>Search Everything</span>
+            </button>
+          </div>
+
+          <footer class="sys-status" aria-label="System status bar">
+            <div class="sys-time" id="sysTime2">15:16</div>
+            <div class="home-dots" aria-hidden="true">
+              <span class="dot" data-dot="left"></span>
+              <span class="bar"></span>
+              <span class="dot" data-dot="right"></span>
+              <span class="dot v" data-dot="top"></span>
+              <span class="dot v" data-dot="bottom"></span>
+            </div>
+            <div class="sys-icons" aria-hidden="true">
+              <span class="icon cell"></span>
+              <span class="icon wifi"></span>
+              <span class="icon batt"></span>
+            </div>
+          </footer>
+        </section>
       </div>
-      <div class="sys-right">
-        <span class="sys-ic">📶</span>
-        <span class="sys-ic">📡</span>
-        <span class="sys-ic">🔋</span>
-      </div>
-    </header>
 
-    <!-- HOME -->
-    <section id="home" class="screen home">
-      <div class="wallpaper"></div>
-
-      <div class="hud">
-        <div class="clockBig">
-          <div class="h" data-hh>11</div>
-          <div class="m" data-mm>05</div>
-        </div>
-        <div class="hudRight">
-          <div class="day">Friday</div>
-          <div class="monthRow"><span class="month">December</span> <span class="dateNum">19</span></div>
-          <div class="weatherRow">
-            <div class="wMain">Cloudy</div>
-            <div class="wRange">8° • 5°</div>
-            <div class="wNow">8°</div>
+      <!-- OVERLAYS / APPS -->
+      <section class="overlay screen search" data-screen="search" aria-label="Search Everything screen">
+        <div class="overlay-bg"></div>
+        <div class="search-top">
+          <div class="search-title">Search Everything</div>
+          <div class="search-input">
+            <span class="magnifier"></span>
+            <input id="searchInput" type="text" placeholder="Apps, web, files, settings…" inputmode="search" />
+            <button id="searchClose" aria-label="Close">✕</button>
           </div>
         </div>
-      </div>
-
-      <div class="homeWidgets">
-        <button class="wTile media" id="openMusicTile" aria-label="Open Music">
-          <div class="thumb"></div>
-          <div class="wText">
-            <div class="wTitle">Christmas</div>
-            <div class="wTitle">Market Fun</div>
-            <div class="wSub">Tap to open Music</div>
+        <div class="search-results scrollable" id="searchResults"></div>
+        <footer class="sys-status no-capsule">
+          <div class="sys-time" id="sysTime3">15:16</div>
+          <div class="home-dots" aria-hidden="true">
+            <span class="dot" data-dot="left"></span>
+            <span class="bar"></span>
+            <span class="dot" data-dot="right"></span>
+            <span class="dot v" data-dot="top"></span>
+            <span class="dot v" data-dot="bottom"></span>
           </div>
-        </button>
+          <div class="sys-icons" aria-hidden="true">
+            <span class="icon cell"></span>
+            <span class="icon wifi"></span>
+            <span class="icon batt"></span>
+          </div>
+        </footer>
+      </section>
 
-        <div class="wTile pillGrad"></div>
-
-        <div class="wActions">
-          <button class="fab orange" data-open="search" aria-label="Search">🔎</button>
-          <button class="fab blue" data-open="connect" aria-label="Connect">✉️</button>
-        </div>
-      </div>
-
-      <div class="agenda">
-        <div class="agendaHead">Tuesday 16ᵗʰ December</div>
-        <div class="agendaBody">
-          <div class="row dim">No events today</div>
-          <div class="row">Tomorrow, 09:00 - 10:00: DPD Delivery Expected</div>
-          <div class="row">Friday, 09:00 - 17:30: Lia @ Work</div>
-          <div class="row">Saturday, 09:00 - 14:30: Lia @ Work</div>
-        </div>
-        <button class="agendaAdd">+</button>
-      </div>
-
-      <div class="homeDock" id="homeDock"></div>
-
-      <button class="homeSearch" id="homeSearch">
-        <span class="magnify">🔍</span>
-        <span class="txt">Search Everything</span>
-      </button>
-
-      <!-- Home indicator -->
-      <div class="homeIndicator" aria-hidden="true"></div>
-    </section>
-
-    <!-- APP DRAWER -->
-    <section id="drawer" class="screen panel hidden">
-      <div class="panelHead">
-        <div class="title">Apps</div>
-        <div class="sub">Swipe down to return</div>
-      </div>
-      <div class="pinned" id="pinnedRow"></div>
-      <div class="apps" id="appsGrid"></div>
-      <div class="homeIndicator" aria-hidden="true"></div>
-    </section>
-
-    <!-- WIDGET HUB -->
-    <section id="widgets" class="screen panel hidden">
-      <div class="panelHead">
-        <div class="title">Widget Hub</div>
-        <div class="sub">Swipe right to return • Tap to add</div>
-      </div>
-      <div class="list" id="widgetList"></div>
-      <div class="homeIndicator" aria-hidden="true"></div>
-    </section>
-
-    <!-- CONNECT HUB -->
-    <section id="connect" class="screen panel hidden">
-      <div class="panelHead">
-        <div class="title">Connect Hub</div>
-        <div class="sub">Unified inbox • Tap title for full view</div>
-      </div>
-      <div class="list" id="connectList"></div>
-      <div class="homeIndicator" aria-hidden="true"></div>
-    </section>
-
-    <!-- MUSIC APP -->
-    <section id="music" class="screen music hidden">
-      <div class="musicBg"></div>
-      <div class="musicGrid scrollable" id="musicGrid"></div>
-
-      <div class="musicBar" id="musicBar">
-        <button class="mCircle mint" id="musicMenuBtn" aria-label="Music menu">≡</button>
-        <button class="mSearch" id="musicSearchBtn" aria-label="Search Music">
-          <span class="mIcon">🔍</span>
-          <span class="mHint" id="musicSearchHint">Search Music</span>
-          <span class="mValue" id="musicSearchValue"></span>
-        </button>
-      </div>
-
-      <div class="musicNav hidden" id="musicNav">
-        <div class="navRow">
-          <button class="mCircle mint" id="musicCloseNav" aria-label="Close music nav">✕</button>
-          <button class="mSearch wide" id="musicSearchBtn2" aria-label="Search Music">
-            <span class="mIcon">🔍</span>
-            <span class="mHint">Search Music</span>
+      <section class="overlay screen connect" data-screen="connect" aria-label="Connect Hub">
+        <div class="overlay-bg"></div>
+        <header class="connect-header">
+          <div class="connect-title">Connect Hub</div>
+          <button class="close-btn" data-close="connect" aria-label="Close">✕</button>
+        </header>
+        <div class="connect-list scrollable" id="connectList"></div>
+        <div class="sys-appbar theme-connect">
+          <button class="menu-btn" data-open-menu="connect" aria-label="Connect options">
+            <span class="menu-lines"></span>
+          </button>
+          <button class="search-pill" id="connectSearchBtn" aria-label="Search Connect">
+            <span class="magnifier"></span>
+            <span>Search Connect</span>
           </button>
         </div>
-        <div class="tabs" id="musicTabs">
-          <button class="tab active" data-tab="home">Home</button>
-          <button class="tab" data-tab="foryou">For You</button>
-          <button class="tab" data-tab="music">Music</button>
-          <button class="tab" data-tab="podcasts">Podcasts</button>
-          <button class="tab" data-tab="radio">Radio</button>
-          <button class="tab" data-tab="library">Library</button>
-          <button class="tab" data-tab="browse">Browse</button>
-        </div>
-      </div>
-
-      <div class="nowPlaying" id="nowPlaying">
-        <div class="art"></div>
-        <div class="npText">
-          <div class="npTitle" id="npTitle">Last Christmas</div>
-          <div class="npArtist" id="npArtist">Wham!</div>
-        </div>
-        <div class="npControls">
-          <button class="npBtn" id="prevBtn" aria-label="Previous">⏮</button>
-          <button class="npBtn" id="playBtn" aria-label="Play/Pause">⏸</button>
-          <button class="npBtn" id="nextBtn" aria-label="Next">⏭</button>
-        </div>
-      </div>
-
-      <div class="player hidden" id="player">
-        <div class="playerTop">
-          <button class="pillBtn" id="playerClose">Close</button>
-          <div class="pTitle">Now Playing</div>
-          <button class="pillBtn" id="playerBackHome">Home</button>
-        </div>
-        <div class="playerArt"></div>
-        <div class="playerMeta">
-          <div class="big" id="pTrack">Last Christmas</div>
-          <div class="sub2" id="pArtist">Wham!</div>
-        </div>
-        <div class="seek">
-          <input id="seek" type="range" min="0" max="100" value="25"/>
-          <div class="seekRow"><span id="tCur">0:58</span><span id="tEnd">3:52</span></div>
-        </div>
-        <div class="playerControls">
-          <button class="ctl" id="pPrev">⏮</button>
-          <button class="ctl bigCtl" id="pPlay">⏸</button>
-          <button class="ctl" id="pNext">⏭</button>
-        </div>
-        <div class="queue">
-          <div class="qHead">Up next</div>
-          <div class="qItem"><span>Everything She Wants</span><span class="muted">Wham!</span></div>
-          <div class="qItem"><span>Careless Whisper</span><span class="muted">George Michael</span></div>
-          <div class="qItem"><span>Wake Me Up Before You Go‑Go</span><span class="muted">Wham!</span></div>
-        </div>
-      </div>
-
-      <div class="searchOverlay hidden" id="musicSearch">
-        <div class="musicSearchTop">
-          <button class="mCircle mint" id="musicBackSearch" aria-label="Back">←</button>
-          <div class="mSearch wide active" id="musicSearchField" aria-label="Search field">
-            <span class="mIcon">🔍</span>
-            <span class="mCursor">|</span>
-            <span class="mHint faint" id="musicSearchPh">Search Music</span>
-            <span class="mValue" id="musicQuery"></span>
+        <footer class="sys-status">
+          <div class="sys-time" id="sysTime4">15:16</div>
+          <div class="home-dots" aria-hidden="true">
+            <span class="dot" data-dot="left"></span>
+            <span class="bar"></span>
+            <span class="dot" data-dot="right"></span>
+            <span class="dot v" data-dot="top"></span>
+            <span class="dot v" data-dot="bottom"></span>
           </div>
-        </div>
-        <div class="searchResults scrollable" id="musicResults"></div>
-        <div class="kbd">
-          <div class="kbdRow" data-row="1"></div>
-          <div class="kbdRow" data-row="2"></div>
-          <div class="kbdRow" data-row="3"></div>
-          <div class="kbdBottom">
-            <button class="kKey wide" data-key="sym">sym</button>
-            <button class="kKey space" data-key="space">space</button>
-            <button class="kKey wide" data-key=".">.</button>
-            <button class="kKey wide" data-key="search">search</button>
+          <div class="sys-icons" aria-hidden="true">
+            <span class="icon cell"></span>
+            <span class="icon wifi"></span>
+            <span class="icon batt"></span>
           </div>
+        </footer>
+      </section>
+
+      <section class="overlay screen music" data-screen="music" aria-label="Music app">
+        <div class="overlay-bg music-bg"></div>
+        <header class="music-header">
+          <div class="music-title">Music</div>
+          <button class="close-btn" data-close="music" aria-label="Close">✕</button>
+        </header>
+
+        <div class="music-content scrollable">
+          <div class="hero">
+            <div class="album-art" id="albumArt"></div>
+            <div class="track-title" id="trackTitle">Last Christmas</div>
+            <div class="track-artist" id="trackArtist">Wham!</div>
+
+            <div class="progress">
+              <span id="tCur">0:42</span>
+              <div class="bar-wrap" aria-label="Progress">
+                <div class="bar-fill" id="barFill"></div>
+              </div>
+              <span id="tEnd">4:23</span>
+            </div>
+
+            <div class="controls">
+              <button class="ctl" id="prevBtn" aria-label="Previous">⏮</button>
+              <button class="ctl big" id="playBtn" aria-label="Play/Pause">⏸</button>
+              <button class="ctl" id="nextBtn" aria-label="Next">⏭</button>
+            </div>
+          </div>
+
+          <div class="section-title">Up Next</div>
+          <div class="tracklist" id="trackList"></div>
+        </div>
+
+        <!-- Bottom bar styled like mt1 -->
+        <div class="sys-appbar theme-music" aria-label="Music app bar">
+          <button class="menu-btn music-menu" data-open-menu="music" aria-label="Music menu">
+            <span class="menu-lines pink"></span>
+          </button>
+          <button class="search-pill music-search" id="musicSearchBtn" aria-label="Search Music">
+            <span class="magnifier white"></span>
+            <span>Search Music</span>
+          </button>
+          <button class="now-playing" id="nowPlayingBtn" aria-label="Now playing">
+            <div class="np-art"></div>
+            <div class="np-meta">
+              <div class="np-title" id="npTitle">Last Christmas</div>
+              <div class="np-artist" id="npArtist">Wham!</div>
+            </div>
+            <div class="np-controls" aria-hidden="true">
+              <span>⏮</span><span id="npPlay">⏸</span><span>⏭</span>
+            </div>
+          </button>
+        </div>
+
+        <footer class="sys-status theme-music-status">
+          <div class="sys-time" id="sysTime5">15:16</div>
+          <div class="home-dots" aria-hidden="true">
+            <span class="dot" data-dot="left"></span>
+            <span class="bar"></span>
+            <span class="dot" data-dot="right"></span>
+            <span class="dot v" data-dot="top"></span>
+            <span class="dot v" data-dot="bottom"></span>
+          </div>
+          <div class="sys-icons" aria-hidden="true">
+            <span class="icon cell"></span>
+            <span class="icon wifi"></span>
+            <span class="icon batt"></span>
+          </div>
+        </footer>
+
+        <!-- Expanded now-playing sheet -->
+        <div class="sheet" id="nowPlayingSheet" aria-hidden="true">
+          <div class="sheet-handle"></div>
+          <div class="sheet-title">Now Playing</div>
+          <div class="sheet-art"></div>
+          <div class="sheet-meta">
+            <div class="track-title" id="sheetTitle">Last Christmas</div>
+            <div class="track-artist" id="sheetArtist">Wham!</div>
+          </div>
+          <div class="progress">
+            <span id="sCur">0:42</span>
+            <div class="bar-wrap">
+              <div class="bar-fill" id="sFill"></div>
+            </div>
+            <span id="sEnd">4:23</span>
+          </div>
+          <div class="controls">
+            <button class="ctl" id="sPrev" aria-label="Previous">⏮</button>
+            <button class="ctl big" id="sPlay" aria-label="Play/Pause">⏸</button>
+            <button class="ctl" id="sNext" aria-label="Next">⏭</button>
+          </div>
+          <button class="sheet-close" id="sheetClose" aria-label="Close now playing">Close</button>
+        </div>
+      </section>
+
+      <!-- System Menu -->
+      <div class="menu-overlay" id="menuOverlay" hidden>
+        <div class="menu-card" role="dialog" aria-modal="true" aria-label="Menu">
+          <div class="menu-title" id="menuTitle">System</div>
+          <div class="menu-grid">
+            <button class="menu-app" data-open="music"><img src="assets/icons/music.png" alt=""><span>Music</span></button>
+            <button class="menu-app" data-open="connect"><img src="assets/icons/connect.png" alt=""><span>Connect</span></button>
+            <button class="menu-app" data-open="search"><img src="assets/icons/widgets.png" alt=""><span>Search</span></button>
+            <button class="menu-app" data-open="widgethub"><img src="assets/icons/widgets.png" alt=""><span>Widgets</span></button>
+            <button class="menu-app" data-open="settings"><img src="assets/icons/settings.png" alt=""><span>Settings</span></button>
+          </div>
+          <button class="menu-close" id="menuClose" aria-label="Close menu">Close</button>
         </div>
       </div>
 
-      <div class="homeIndicator" aria-hidden="true"></div>
-    </section>
+      <!-- Gesture debug (hidden by default) -->
+      <div id="toast" class="toast" hidden></div>
+    </div>
+  </div>
 
-  </div> <!-- /capsule -->
-
-</div> <!-- /appShell -->
-<script src="app.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./service-worker.js");
+    }
+  </script>
 </body>
 </html>

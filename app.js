@@ -1,308 +1,476 @@
+/* FibreOS prototype (v23)
+   - Pixel-perfect-ish layout for the provided home + music bar style
+   - No page reloads, no browser scroll pull-to-refresh
+   - GMT/UTC time + date
+   - Weather (Huddersfield) via Open-Meteo (no key)
+*/
 
-const $ = (id)=>document.getElementById(id);
-const screens = ["home","drawer","widgets","connect","music"];
 const state = {
-  surface:"home",
-  apps:["Music","Browser","Messages","Camera","Photos","Settings","Files","Notes","Connect"],
-  music:{
-    playing:true,
-    track:{title:"Last Christmas", artist:"Wham!"},
-    query:"",
-    tab:"home"
-  }
+  spaceIndex: 0,              // 0 home, 1 widgethub
+  overlay: null,              // "search" | "connect" | "music"
+  isPlaying: true,
+  progress: 0.35,
+  tracks: [
+    { title: "Last Christmas", artist: "Wham!", dur: "4:23" },
+    { title: "Jingle Bell Rock", artist: "Bobby Helms", dur: "2:10" },
+    { title: "Santa Tell Me", artist: "Ariana Grande", dur: "3:24" },
+    { title: "Fairytale of New York", artist: "The Pogues", dur: "4:33" },
+    { title: "Merry Xmas Everybody", artist: "Slade", dur: "3:46" },
+  ],
+  weather: { desc: "Loading…", temp: "—°", hi: "—", lo: "—" },
 };
 
-function setDebug(){ const d=$("debug"); if(d) d.textContent = state.surface + (state.surface==="music" ? `:${state.music.tab}`:""); }
-function show(id){
-  screens.forEach(s=>$(s).classList.toggle("hidden", s!==id));
-  state.surface=id;
-  setDebug();
-  location.hash = id; // makes refresh land on same screen
-}
-function toast(msg){
-  const t=$("toast"); t.textContent=msg; t.classList.remove("hidden");
-  clearTimeout(toast._tm); toast._tm=setTimeout(()=>t.classList.add("hidden"), 1200);
-}
-function tick(){
-  const d=new Date();
-  const hh=String(d.getHours()).padStart(2,"0");
-  const mm=String(d.getMinutes()).padStart(2,"0");
-  document.querySelectorAll("[data-hh]").forEach(e=>e.textContent=hh);
-  document.querySelectorAll("[data-mm]").forEach(e=>e.textContent=mm);
-}
-setInterval(tick, 5000); tick();
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-function wireHome(){
-  $("openMusicTile").onclick=()=>show("music");
-  $("homeSearch").onclick=()=>toast("Search Everything (mock)");
-  document.querySelectorAll(".fab").forEach(b=>{
-    b.onclick=()=>{
-      const open=b.dataset.open;
-      if(open==="connect") show("connect");
-      else toast("Search (mock)");
-    };
+function setScale(){
+  const w = 360, h = 808;
+  const s = Math.min(window.innerWidth / w, window.innerHeight / h);
+  $("#capsule").style.setProperty("--scale", String(Math.max(0.65, Math.min(1.2, s))));
+}
+window.addEventListener("resize", setScale);
+setScale();
+
+/* ---------- Time (UTC/GMT) ---------- */
+function fmtTimeUTC(d){
+  return d.toLocaleTimeString("en-GB", { timeZone: "UTC", hour: "2-digit", minute: "2-digit", hour12: false });
+}
+function fmtWeekdayUTC(d){
+  return d.toLocaleDateString("en-GB", { timeZone:"UTC", weekday:"long" });
+}
+function fmtMonthUTC(d){
+  return d.toLocaleDateString("en-GB", { timeZone:"UTC", month:"long" });
+}
+function fmtDayUTC(d){
+  return d.toLocaleDateString("en-GB", { timeZone:"UTC", day:"2-digit" });
+}
+function updateTime(){
+  const d = new Date();
+  const t = fmtTimeUTC(d);
+  // status bars
+  ["#sysTime","#sysTime2","#sysTime3","#sysTime4","#sysTime5"].forEach(id => {
+    const el = $(id);
+    if (el) el.textContent = t;
   });
-}
-wireHome();
+  // big clock digits on home (HH:MM)
+  const hh = t.slice(0,2);
+  const mm = t.slice(3,5);
+  $("#t_h1").textContent = hh[0];
+  $("#t_h2").textContent = hh[1];
+  $("#t_m1").textContent = mm[0];
+  $("#t_m2").textContent = mm[1];
 
-function renderHomeDock(){
-  const dock=$("homeDock");
-  dock.innerHTML="";
-  const icons=[
-    {cls:"music", glyph:"♪", open:"music"},
-    {cls:"home", glyph:"⌂", open:"home"},
-    {cls:"photos", glyph:"🖼️"},
-    {cls:"camera", glyph:"📷"},
+  $("#dw_weekday").textContent = fmtWeekdayUTC(d);
+  $("#dw_month").textContent = fmtMonthUTC(d);
+  $("#dw_day").textContent = String(parseInt(fmtDayUTC(d),10));
+
+  // calendar header (dummy, but UTC)
+  const suffix = (n) => {
+    if (n % 100 >= 11 && n % 100 <= 13) return "th";
+    if (n % 10 === 1) return "st";
+    if (n % 10 === 2) return "nd";
+    if (n % 10 === 3) return "rd";
+    return "th";
+  };
+  const day = parseInt(fmtDayUTC(d),10);
+  $("#calHeader").textContent = `${fmtWeekdayUTC(d)} ${day}${suffix(day)} ${fmtMonthUTC(d)}`;
+}
+updateTime();
+setInterval(updateTime, 10_000);
+
+/* ---------- Weather (Huddersfield) ---------- */
+const WX_KEY = "fibreos_wx_cache_v1";
+const WX_TS_KEY = "fibreos_wx_ts_v1";
+
+function weatherCodeToText(code){
+  // Open-Meteo weather_code mapping (lightweight)
+  const map = [
+    [0, "Clear"],
+    [1, "Mainly clear"],
+    [2, "Partly cloudy"],
+    [3, "Cloudy"],
+    [45, "Fog"],
+    [48, "Rime fog"],
+    [51, "Light drizzle"],
+    [53, "Drizzle"],
+    [55, "Heavy drizzle"],
+    [61, "Light rain"],
+    [63, "Rain"],
+    [65, "Heavy rain"],
+    [71, "Light snow"],
+    [73, "Snow"],
+    [75, "Heavy snow"],
+    [80, "Rain showers"],
+    [81, "Showers"],
+    [82, "Violent showers"],
+    [95, "Thunderstorm"],
+    [96, "Thunder + hail"],
+    [99, "Thunder + hail"],
   ];
-  icons.forEach(i=>{
-    const b=document.createElement("button");
-    b.className="dIcon "+i.cls;
-    b.type="button";
-    b.textContent=i.glyph;
-    b.onclick=()=>{ i.open ? show(i.open) : toast(i.glyph); };
-    dock.appendChild(b);
+  for (const [k,v] of map){
+    if (k === code) return v;
+  }
+  return "Weather";
+}
+
+async function fetchWeatherHuddersfield(){
+  // Cache for 30 mins to avoid hammering APIs
+  const last = Number(localStorage.getItem(WX_TS_KEY) || "0");
+  if (Date.now() - last < 30 * 60 * 1000) {
+    const cached = localStorage.getItem(WX_KEY);
+    if (cached) return JSON.parse(cached);
+  }
+
+  const geoUrl = "https://geocoding-api.open-meteo.com/v1/search?name=Huddersfield&count=1&language=en&format=json";
+  const geo = await (await fetch(geoUrl)).json();
+  if (!geo?.results?.length) throw new Error("No geocode results for Huddersfield");
+
+  const { latitude, longitude } = geo.results[0];
+
+  const wxUrl = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=UTC`;
+  const data = await (await fetch(wxUrl)).json();
+
+  const code = data?.current?.weather_code;
+  const temp = Math.round(data?.current?.temperature_2m);
+  const hi = Math.round(data?.daily?.temperature_2m_max?.[0]);
+  const lo = Math.round(data?.daily?.temperature_2m_min?.[0]);
+
+  const result = {
+    desc: weatherCodeToText(code),
+    temp: Number.isFinite(temp) ? `${temp}°` : "—°",
+    hi: Number.isFinite(hi) ? hi : "—",
+    lo: Number.isFinite(lo) ? lo : "—",
+  };
+  localStorage.setItem(WX_KEY, JSON.stringify(result));
+  localStorage.setItem(WX_TS_KEY, String(Date.now()));
+  return result;
+}
+
+async function updateWeather(){
+  try{
+    const w = await fetchWeatherHuddersfield();
+    state.weather = w;
+    $("#wx_desc").textContent = w.desc;
+    $("#wx_temp").textContent = w.temp;
+    $("#wx_range").textContent = `${w.hi}° • ${w.lo}°`;
+  }catch(e){
+    $("#wx_desc").textContent = "Weather unavailable";
+  }
+}
+updateWeather();
+setInterval(updateWeather, 30 * 60 * 1000);
+
+/* ---------- Navigation ---------- */
+function setSpace(idx){
+  state.spaceIndex = Math.max(0, Math.min(1, idx));
+  $("#spaces").style.transform = `translateX(${state.spaceIndex * -360}px)`;
+}
+function openOverlay(name){
+  state.overlay = name;
+  const el = document.querySelector(`.overlay[data-screen="${name}"]`);
+  if (el) el.classList.add("open");
+  // ensure keyboard focus for search
+  if (name === "search") {
+    setTimeout(() => $("#searchInput")?.focus(), 50);
+  }
+}
+function closeOverlay(name){
+  const el = document.querySelector(`.overlay[data-screen="${name}"]`);
+  if (el) el.classList.remove("open");
+  if (state.overlay === name) state.overlay = null;
+}
+
+/* Buttons that open overlays */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-open]");
+  if (btn){
+    const target = btn.getAttribute("data-open");
+    if (target === "home") { setSpace(0); return; }
+    if (target === "widgethub") { setSpace(1); return; }
+    if (["search","connect","music"].includes(target)) { openOverlay(target); return; }
+    // placeholder for other apps
+    toast(`"${target}" is a dummy app for now.`);
+  }
+  const close = e.target.closest("[data-close]");
+  if (close){
+    closeOverlay(close.getAttribute("data-close"));
+  }
+});
+
+/* Search Everything */
+function buildSearchResults(query){
+  const q = query.trim().toLowerCase();
+  const apps = [
+    { name:"Music", sub:"App", icon:"assets/icons/music.png", open:"music" },
+    { name:"Connect Hub", sub:"System app", icon:"assets/icons/connect.png", open:"connect" },
+    { name:"Widget Hub", sub:"Space", icon:"assets/icons/widgets.png", open:"widgethub" },
+    { name:"Settings", sub:"System app (dummy)", icon:"assets/icons/settings.png", open:"settings" },
+    { name:"Camera", sub:"App (dummy)", icon:"assets/icons/camera.png", open:"camera" },
+  ];
+
+  const results = apps.filter(a => !q || a.name.toLowerCase().includes(q)).slice(0, 6);
+
+  // web + other dummy results
+  if (q){
+    results.push({ name:`Search the web for “${query}”`, sub:"Web", icon:"assets/icons/browser.png", open:"browser" });
+    results.push({ name:`Settings: ${query}`, sub:"System", icon:"assets/icons/settings.png", open:"settings" });
+    results.push({ name:`Files matching: ${query}`, sub:"Files", icon:"assets/icons/widgets.png", open:"files" });
+  }
+  return results;
+}
+
+function renderSearchResults(){
+  const q = $("#searchInput").value;
+  const list = buildSearchResults(q);
+  const root = $("#searchResults");
+  root.innerHTML = "";
+  list.forEach(item => {
+    const row = document.createElement("button");
+    row.className = "result";
+    row.type = "button";
+    row.innerHTML = `
+      <img src="${item.icon}" alt="">
+      <div class="r-meta">
+        <div class="r-title">${escapeHtml(item.name)}</div>
+        <div class="r-sub">${escapeHtml(item.sub)}</div>
+      </div>
+      <div aria-hidden="true">›</div>
+    `;
+    row.addEventListener("click", () => {
+      closeOverlay("search");
+      if (item.open === "widgethub") setSpace(1);
+      else if (item.open === "home") setSpace(0);
+      else if (["music","connect","search"].includes(item.open)) openOverlay(item.open);
+      else toast(`"${item.open}" is a dummy action.`);
+    });
+    root.appendChild(row);
   });
 }
-renderHomeDock();
+$("#globalSearchBtn").addEventListener("click", () => openOverlay("search"));
+$("#globalSearchBtn2").addEventListener("click", () => openOverlay("search"));
+$("#searchClose").addEventListener("click", () => closeOverlay("search"));
+$("#searchInput").addEventListener("input", renderSearchResults);
+renderSearchResults();
 
-function renderDrawer(){
-  const pr=$("pinnedRow"); pr.innerHTML="";
-  ["Music","Browser","Messages","Camera"].forEach(a=>{
-    const x=document.createElement("button"); x.className="app"; x.type="button"; x.textContent=a[0];
-    x.onclick=()=>{ if(a==="Music") show("music"); else toast("Open "+a); };
-    pr.appendChild(x);
-  });
-  const ag=$("appsGrid"); ag.innerHTML="";
-  state.apps.forEach(a=>{
-    const x=document.createElement("button"); x.className="app"; x.type="button"; x.textContent=a[0];
-    x.onclick=()=>{ if(a==="Music") show("music"); else if(a==="Connect") show("connect"); else toast("Open "+a); };
-    ag.appendChild(x);
-  });
-}
-renderDrawer();
-
+/* Connect Hub dummy threads */
 function renderConnect(){
-  const list=$("connectList"); list.innerHTML="";
-  ["Messages","Calls","Contacts","Upcoming events","Shared files"].forEach(w=>{
-    const c=document.createElement("div"); c.className="card";
-    c.innerHTML=`<div class="cardTitle">${w}</div><div class="sub">Tap title for full view</div>`;
-    c.onclick=()=>toast("Open "+w);
-    list.appendChild(c);
+  const threads = [
+    { who:"Lia", via:"WhatsApp", msg:"Do you want anything from the shop?", unread:2 },
+    { who:"Mum", via:"RCS", msg:"Are you free Sunday?", unread:0 },
+    { who:"VP Trade Team", via:"Slack", msg:"New build is on staging.", unread:5 },
+    { who:"Beans 🐈", via:"Telepathy", msg:"feed me. now.", unread:99 },
+    { who:"DPD", via:"Email", msg:"Your parcel arrives tomorrow 09:00–10:00", unread:1 },
+  ];
+  const root = $("#connectList");
+  root.innerHTML = "";
+  threads.forEach(t => {
+    const row = document.createElement("div");
+    row.className = "thread";
+    row.innerHTML = `
+      <div class="avatar">${escapeHtml(t.who.slice(0,1).toUpperCase())}</div>
+      <div class="meta">
+        <div class="name">${escapeHtml(t.who)} <span style="opacity:.7;font-weight:700;">· ${escapeHtml(t.via)}</span></div>
+        <div class="snippet">${escapeHtml(t.msg)}</div>
+      </div>
+      ${t.unread ? `<div class="badge">${t.unread}</div>` : ``}
+    `;
+    root.appendChild(row);
   });
 }
 renderConnect();
 
-function renderWidgets(){
-  const list=$("widgetList"); list.innerHTML="";
-  ["Now Playing","Calendar","Weather","Files","Photos","Smart Home"].forEach(w=>{
-    const c=document.createElement("div"); c.className="card";
-    c.innerHTML=`<div class="cardTitle">${w}</div><div class="sub">Tap to add to Home (mock)</div>`;
-    c.onclick=()=>toast("Add widget: "+w);
-    list.appendChild(c);
+/* Music app */
+function renderTrackList(){
+  const root = $("#trackList");
+  root.innerHTML = "";
+  state.tracks.forEach((t, i) => {
+    const row = document.createElement("button");
+    row.className = "trackrow";
+    row.type = "button";
+    row.innerHTML = `
+      <div class="mini"></div>
+      <div class="meta">
+        <div class="t">${escapeHtml(t.title)}</div>
+        <div class="a">${escapeHtml(t.artist)}</div>
+      </div>
+      <div class="dur">${escapeHtml(t.dur)}</div>
+    `;
+    row.addEventListener("click", () => {
+      setNowPlaying(t.title, t.artist);
+      state.progress = Math.min(0.95, 0.15 + i*0.12);
+      syncProgress();
+      toast(`Playing: ${t.title} — ${t.artist}`);
+    });
+    root.appendChild(row);
   });
 }
-renderWidgets();
+renderTrackList();
 
+function setNowPlaying(title, artist){
+  $("#trackTitle").textContent = title;
+  $("#trackArtist").textContent = artist;
+  $("#npTitle").textContent = title;
+  $("#npArtist").textContent = artist;
+  $("#sheetTitle").textContent = title;
+  $("#sheetArtist").textContent = artist;
+}
 
-function renderMusicGrid(){
-  const grid=$("musicGrid"); grid.innerHTML="";
-  const palettes = {
-    home:["#ffe548","#5e2ea6","#b0125a","#f06452","#49a84d","#53c6ff","#3e51b5","#ff9dbf"],
-    foryou:["#ff9dbf","#ffe548","#53c6ff","#49a84d","#f06452","#5e2ea6","#3e51b5","#b0125a"],
-    music:["#53c6ff","#3e51b5","#49a84d","#ffe548","#f06452","#ff9dbf","#5e2ea6","#b0125a"],
-    podcasts:["#5e2ea6","#3e51b5","#53c6ff","#ffe548","#ff9dbf","#b0125a","#f06452","#49a84d"],
-    radio:["#49a84d","#ffe548","#f06452","#53c6ff","#3e51b5","#5e2ea6","#b0125a","#ff9dbf"],
-    library:["#b0125a","#ff9dbf","#f06452","#ffe548","#49a84d","#53c6ff","#3e51b5","#5e2ea6"],
-    browse:["#f06452","#49a84d","#53c6ff","#3e51b5","#5e2ea6","#b0125a","#ff9dbf","#ffe548"],
+function syncPlayState(){
+  const icon = state.isPlaying ? "⏸" : "▶";
+  $("#playBtn").textContent = icon;
+  $("#npPlay").textContent = icon;
+  $("#sPlay").textContent = icon;
+}
+function syncProgress(){
+  const pct = Math.round(state.progress * 100);
+  $("#barFill").style.width = pct + "%";
+  $("#sFill").style.width = pct + "%";
+}
+syncPlayState();
+syncProgress();
+
+["#playBtn","#sPlay"].forEach(id => {
+  $(id).addEventListener("click", () => {
+    state.isPlaying = !state.isPlaying;
+    syncPlayState();
+  });
+});
+["#prevBtn","#nextBtn","#sPrev","#sNext"].forEach(id => {
+  $(id).addEventListener("click", () => toast("Playback controls are wired (dummy)."));
+});
+
+/* Now playing sheet */
+const sheet = $("#nowPlayingSheet");
+$("#nowPlayingBtn").addEventListener("click", () => {
+  sheet.classList.add("open");
+  sheet.setAttribute("aria-hidden","false");
+});
+$("#sheetClose").addEventListener("click", () => {
+  sheet.classList.remove("open");
+  sheet.setAttribute("aria-hidden","true");
+});
+
+/* Menu */
+const menuOverlay = $("#menuOverlay");
+const menuTitle = $("#menuTitle");
+function openMenu(title){
+  menuTitle.textContent = title;
+  menuOverlay.hidden = false;
+}
+function closeMenu(){
+  menuOverlay.hidden = true;
+}
+$("#menuClose").addEventListener("click", closeMenu);
+menuOverlay.addEventListener("click", (e) => {
+  if (e.target === menuOverlay) closeMenu();
+});
+
+document.addEventListener("click", (e) => {
+  const m = e.target.closest("[data-open-menu]");
+  if (m){
+    openMenu(m.getAttribute("data-open-menu") === "music" ? "Music" : "System");
+  }
+  const app = e.target.closest(".menu-app");
+  if (app){
+    closeMenu();
+    const t = app.getAttribute("data-open");
+    if (t === "widgethub") setSpace(1);
+    else if (t === "music") openOverlay("music");
+    else if (t === "connect") openOverlay("connect");
+    else if (t === "search") openOverlay("search");
+    else toast(`"${t}" is a dummy app.`);
+  }
+});
+
+/* ---------- Gestures ---------- */
+let touch = null;
+
+function isInScrollable(target){
+  const sc = target.closest(".scrollable");
+  if (!sc) return false;
+  // allow vertical scroll inside scrollables
+  return true;
+}
+
+$("#capsule").addEventListener("pointerdown", (e) => {
+  // Don't start gestures if an overlay is open and the user is interacting with a scrollable.
+  const inScroll = isInScrollable(e.target);
+  touch = {
+    id: e.pointerId,
+    x0: e.clientX,
+    y0: e.clientY,
+    t0: performance.now(),
+    inScroll,
+    decided: false,
+    axis: null,
   };
-  const colors = palettes[state.music.tab] || palettes.home;
-  for(let i=0;i<8;i++){
-    const d=document.createElement("div");
-    d.className="mSq";
-    d.style.background=colors[i%colors.length];
-    grid.appendChild(d);
-  }
-}
-renderMusicGrid();
+  $("#capsule").setPointerCapture(e.pointerId);
+});
 
-function setPlaying(on){
-  state.music.playing=on;
-  $("playBtn").textContent = on ? "⏸" : "▶";
-  $("pPlay").textContent = on ? "⏸" : "▶";
-}
-function openPlayer(){ $("player").classList.remove("hidden"); }
-function closePlayer(){ $("player").classList.add("hidden"); }
+$("#capsule").addEventListener("pointermove", (e) => {
+  if (!touch || touch.id !== e.pointerId) return;
 
-$("nowPlaying").onclick=(e)=>{ if(e.target.closest(".npBtn")) return; openPlayer(); };
-$("playerClose").onclick=closePlayer;
-$("playerBackHome").onclick=()=>{ closePlayer(); $("musicNav").classList.add("hidden"); };
+  const dx = e.clientX - touch.x0;
+  const dy = e.clientY - touch.y0;
 
-$("prevBtn").onclick=()=>toast("Prev");
-$("nextBtn").onclick=()=>toast("Next");
-$("playBtn").onclick=()=>setPlaying(!state.music.playing);
-$("pPrev").onclick=()=>toast("Prev");
-$("pNext").onclick=()=>toast("Next");
-$("pPlay").onclick=()=>setPlaying(!state.music.playing);
-
-$("musicMenuBtn").onclick=()=>$("musicNav").classList.remove("hidden");
-$("musicCloseNav").onclick=()=>$("musicNav").classList.add("hidden");
-
-// Tabs now actually change content + active state
-$("musicTabs").onclick=(e)=>{
-  const btn=e.target.closest(".tab");
-  if(!btn) return;
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  btn.classList.add("active");
-  state.music.tab = btn.dataset.tab || "home";
-  renderMusicGrid();
-  toast("Tab: "+btn.textContent);
-};
-
-// Search overlay
-function openMusicSearch(){
-  $("musicSearch").classList.remove("hidden");
-  state.music.query="";
-  $("musicQuery").textContent="";
-  $("musicSearchPh").classList.remove("hidden");
-  renderMusicResults("");
-}
-function closeMusicSearch(){ $("musicSearch").classList.add("hidden"); }
-$("musicSearchBtn").onclick=openMusicSearch;
-$("musicSearchBtn2").onclick=openMusicSearch;
-$("musicBackSearch").onclick=closeMusicSearch;
-
-function renderMusicResults(q){
-  const box=$("musicResults"); box.innerHTML="";
-  const tracks=[
-    {t:"Last Christmas", a:"Wham!"},
-    {t:"Everything She Wants", a:"Wham!"},
-    {t:"Careless Whisper", a:"George Michael"},
-    {t:"Wake Me Up Before You Go‑Go", a:"Wham!"},
-    {t:"Blue (Da Ba Dee)", a:"Eiffel 65"},
-    {t:"Mr. Brightside", a:"The Killers"},
-  ];
-  const qq=(q||"").trim().toLowerCase();
-  const hits=tracks.filter(x=>!qq || x.t.toLowerCase().includes(qq) || x.a.toLowerCase().includes(qq)).slice(0,8);
-  hits.forEach(x=>{
-    const r=document.createElement("div");
-    r.className="res";
-    r.innerHTML=`<div class="t">${x.t}</div><div class="s">${x.a}</div>`;
-    r.onclick=()=>{
-      state.music.track={title:x.t, artist:x.a};
-      $("npTitle").textContent=x.t; $("npArtist").textContent=x.a;
-      $("pTrack").textContent=x.t; $("pArtist").textContent=x.a;
-      closeMusicSearch();
-      toast("Play: "+x.t);
-      setPlaying(true);
-    };
-    box.appendChild(r);
-  });
-  if(hits.length===0){
-    const r=document.createElement("div");
-    r.className="res";
-    r.innerHTML=`<div class="t">No results</div><div class="s">Try another search</div>`;
-    box.appendChild(r);
-  }
-}
-
-function typeKey(k){
-  if(k==="back") state.music.query = state.music.query.slice(0,-1);
-  else if(k==="space") state.music.query += " ";
-  else if(k==="search") {/* live */}
-  else if(k==="sym") toast("Symbols (mock)");
-  else state.music.query += k;
-  $("musicQuery").textContent = state.music.query;
-  $("musicSearchPh").classList.toggle("hidden", state.music.query.length>0);
-  renderMusicResults(state.music.query);
-}
-const row1="1234567890".split("");
-const row2="qwertyuiop".split("");
-const row3="asdfghjkl".split("");
-function fillRow(rowId, keys){
-  const row=document.querySelector(`.kbdRow[data-row="${rowId}"]`);
-  row.innerHTML="";
-  keys.forEach(k=>{
-    const b=document.createElement("button");
-    b.className="kKey";
-    b.type="button";
-    b.textContent=(k==="back")?"⌫":k;
-    b.onclick=()=>typeKey(k);
-    row.appendChild(b);
-  });
-}
-fillRow("1", row1);
-fillRow("2", row2);
-fillRow("3", row3.concat(["back"]));
-document.querySelectorAll(".kbdBottom .kKey").forEach(b=>b.onclick=()=>typeKey(b.dataset.key));
-
-// Gestures with safer routing
-let sx=0, sy=0, t0=0;
-document.addEventListener("touchstart",(e)=>{
-  const p=e.touches[0]; sx=p.clientX; sy=p.clientY; t0=performance.now();
-},{passive:true});
-document.addEventListener("touchend",(e)=>{
-  const p=e.changedTouches[0];
-  const dx=p.clientX-sx, dy=p.clientY-sy, dt=performance.now()-t0;
-  if(Math.max(Math.abs(dx),Math.abs(dy))<40 || dt>650) return;
-  const dir=(Math.abs(dx)>Math.abs(dy))?(dx>0?"right":"left"):(dy>0?"down":"up");
-
-  // music overlays close with down swipe
-  if(state.surface==="music"){
-    if(!$("musicSearch").classList.contains("hidden") && dir==="down"){ closeMusicSearch(); return; }
-    if(!$("player").classList.contains("hidden") && dir==="down"){ closePlayer(); return; }
+  // If user started on a scrollable, don't steal the gesture unless it's clearly horizontal
+  if (!touch.decided){
+    const ax = Math.abs(dx);
+    const ay = Math.abs(dy);
+    if (ax < 12 && ay < 12) return;
+    touch.decided = true;
+    touch.axis = ax > ay ? "x" : "y";
+    // if started in scrollable + vertical, let the scrollable handle it
+    if (touch.inScroll && touch.axis === "y") {
+      // do nothing (browser will scroll inside element)
+      return;
+    }
   }
 
-  if(state.surface==="home"){
-    if(dir==="up") show("drawer");
-    if(dir==="left") show("connect");
-    if(dir==="right") show("widgets");
-    if(dir==="down") show("music"); // demo shortcut
-  } else if(state.surface==="drawer"){
-    if(dir==="down") 
-// Prevent Android Chrome pull-to-refresh within the capsule
-let _ptrY = null;
-document.addEventListener("touchstart",(e)=>{
-  _ptrY = e.touches[0].clientY;
-},{passive:true});
-document.addEventListener("touchmove",(e)=>{
-  if(_ptrY===null) return;
-  const y = e.touches[0].clientY;
-  const dy = y - _ptrY;
-  // If pulling down from very top of capsule, block browser refresh
-  const atTop = (document.scrollingElement ? document.scrollingElement.scrollTop : 0) === 0;
-  if(atTop && dy > 0 && _ptrY < 70){
-    e.preventDefault();
+  // prevent default scrolling on our controlled gestures
+  if (!(touch.inScroll && touch.axis === "y")) e.preventDefault();
+}, { passive:false });
+
+$("#capsule").addEventListener("pointerup", (e) => {
+  if (!touch || touch.id !== e.pointerId) return;
+  const dx = e.clientX - touch.x0;
+  const dy = e.clientY - touch.y0;
+  const ax = Math.abs(dx);
+  const ay = Math.abs(dy);
+
+  // If vertical scroll inside a scrollable, ignore.
+  if (touch.inScroll && touch.axis === "y") { touch = null; return; }
+
+  // Gestures are only active when NO overlay is open (simple rule for prototype stability)
+  if (state.overlay) { touch = null; return; }
+
+  // Horizontal: switch spaces
+  if (ax > ay && ax > 60){
+    if (dx > 0) setSpace(1);     // swipe right => widget hub
+    else setSpace(0);            // swipe left => home
+    touch = null;
+    return;
   }
-},{passive:false});
 
-show("home");
-  } else if(state.surface==="widgets"){
-    if(dir==="right") show("home");
-  } else if(state.surface==="connect"){
-    if(dir==="left") show("home");
-  } else if(state.surface==="music"){
-    if(dir==="right") show("home");
+  // Vertical on home: swipe up => toast (app drawer later), swipe down => toast (multitask later)
+  if (ay > ax && ay > 60){
+    if (dy < 0) toast("Swipe up: App Drawer (coming next)");
+    else toast("Swipe down: Multitasking (coming next)");
   }
-},{passive:true});
 
-// hash routing (prevents “no changes” confusion when refreshing)
-function routeFromHash(){
-  const h=(location.hash||"").replace("#","").trim();
-  if(screens.includes(h)) show(h);
-}
-window.addEventListener("hashchange", routeFromHash);
+  touch = null;
+});
 
-// PWA SW
-if("serviceWorker" in navigator){
-  window.addEventListener("load", async ()=>{
-    try{
-      const reg = await navigator.serviceWorker.register("sw.js");
-      // ensure latest takes over quickly
-      if(reg.waiting) reg.waiting.postMessage({type:"SKIP_WAITING"});
-    }catch(e){}
-  });
+function toast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.hidden = false;
+  clearTimeout(toast._tm);
+  toast._tm = setTimeout(() => t.hidden = true, 1500);
 }
 
-show("home");
-setPlaying(true);
-routeFromHash();
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, (c) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
