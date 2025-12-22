@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#111111"/>
+  <title>FibreOS Prototype</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div id="root">
+  <!-- AOD -->
+  <section id="aod" class="screen hidden">
+    <div class="bg"></div>
+    <div class="stack">
+      <div class="time" data-time></div>
+      <div class="sub" data-date></div>
+      <div class="sub">8° Cloudy</div>
+    </div>
+    <div class="hint">Tap to wake • Swipe up</div>
+  </section>
+
+  <!-- Lock -->
+  <section id="lock" class="screen hidden">
+    <div class="bg blur dim"></div>
+    <div class="stack">
+      <div class="time" data-time></div>
+      <div class="sub" data-date></div>
+      <div class="sub">8° Cloudy</div>
+    </div>
+
+    <div class="corner left">↖︎ Notifs</div>
+    <div class="corner right">QS ↗︎</div>
+    <div class="hint">Swipe up to unlock</div>
+  </section>
+
+  <!-- Home -->
+  <section id="home" class="screen">
+    <div class="bg"></div>
+
+    <div id="floatables">
+      <div class="floatable" data-f="clock"><div class="time" data-time></div></div>
+      <div class="floatable" data-f="date" style="top:120px;"><div class="sub" data-date></div></div>
+      <div class="floatable" data-f="weather" style="top:152px;"><div class="sub">8° Cloudy</div></div>
+    </div>
+
+    <div id="grid" class="grid"></div>
+
+    <div id="live" class="live hidden">
+      <div class="dot"></div>
+      <div class="liveText">Now playing</div>
+      <button id="liveExpand" class="icon">▴</button>
+    </div>
+
+    <div id="dock" class="dock"></div>
+
+    <div class="bar">
+      <button id="menuBtn" class="icon">≡</button>
+      <button id="searchBtn" class="search">Search</button>
+      <button id="npBtn" class="icon" title="Collapsed now playing">◍</button>
+    </div>
+  </section>
+
+  <!-- Drawer -->
+  <section id="drawer" class="screen hidden panel">
+    <div class="panelHead">
+      <div class="title">Apps</div>
+      <div class="sub">Swipe down to return</div>
+    </div>
+    <div class="pinned" id="pinnedRow"></div>
+    <div class="apps" id="appsGrid"></div>
+  </section>
+
+  <!-- Widgets -->
+  <section id="widgets" class="screen hidden panel">
+    <div class="panelHead">
+      <div class="title">Widget Hub</div>
+      <div class="sub">Swipe right to return • Tap to add</div>
+    </div>
+    <div class="list" id="widgetList"></div>
+  </section>
+
+  <!-- Connect -->
+  <section id="connect" class="screen hidden panel">
+    <div class="panelHead">
+      <div class="title">Connect Hub</div>
+      <div class="sub">Unified inbox • Tap title for full view</div>
+    </div>
+    <div class="list" id="connectList"></div>
+  </section>
+
+  <!-- Overview -->
+  <section id="overview" class="screen hidden panel">
+    <div class="panelHead">
+      <div class="title">Overview</div>
+      <div class="sub">Swipe up to return • Swipe left/right for Spaces</div>
+    </div>
+    <div class="spaces" id="spaces"></div>
+    <div class="list" id="recents"></div>
+  </section>
+
+  <!-- Notifs shade -->
+  <aside id="notifs" class="shade hidden">
+    <div class="shadeHead">Notifications (redacted)</div>
+    <div class="list" id="notifList"></div>
+    <div class="sub pad">Swipe down to close</div>
+  </aside>
+
+  <!-- Quick settings shade -->
+  <aside id="qs" class="shade hidden">
+    <div class="shadeHead">Quick Settings</div>
+    <div class="list pad">
+      <div class="row"><span>Wi‑Fi</span><button class="pill">On</button></div>
+      <div class="row"><span>Bluetooth</span><button class="pill">Off</button></div>
+      <div class="row"><span>DND</span><button class="pill">Off</button></div>
+      <div class="row"><span>Brightness</span><input type="range" value="70"/></div>
+    </div>
+    <div class="sub pad">Swipe down to close</div>
+  </aside>
+
+  <!-- System sheet -->
+  <aside id="sheet" class="sheet hidden">
+    <div class="sheetHead">
+      <div class="title">System</div>
+      <button id="sheetClose" class="icon">✕</button>
+    </div>
+    <div class="list pad">
+      <button id="editBtn" class="btn">Customise Home</button>
+      <button id="liveBtn" class="btn">Toggle Live Activity</button>
+      <button id="lockBtn" class="btn">Lock</button>
+    </div>
+  </aside>
+
+  <!-- Edit overlay -->
+  <div id="edit" class="edit hidden">
+    <div class="pill">Edit mode • Drag clock/date/weather</div>
+    <button id="doneBtn" class="pill big">Done</button>
+  </div>
+
+  <!-- Search overlay -->
+  <div id="search" class="searchOverlay hidden">
+    <div class="results" id="results"></div>
+    <div class="searchRow">
+      <button id="scope" class="pill small">In‑app</button>
+      <input id="q" placeholder="Search"/>
+    </div>
+    <div class="kbd">
+      <div class="kbdRow">Q W E R T Y U I O P</div>
+      <div class="kbdRow">A S D F G H J K L</div>
+      <div class="kbdRow"><button data-k="space" class="pill small">Space</button><button data-k="back" class="pill small">⌫</button></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
