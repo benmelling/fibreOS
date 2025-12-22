@@ -3,67 +3,73 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <meta name="theme-color" content="#111111"/>
-  <title>FibreOS Prototype</title>
+  <meta name="theme-color" content="#0b0b0f"/>
+  <title>FibreOS Prototype v2</title>
   <link rel="manifest" href="manifest.json"/>
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 <div id="root">
-  <!-- AOD -->
-  <section id="aod" class="screen hidden">
-    <div class="bg"></div>
-    <div class="stack">
-      <div class="time" data-time></div>
-      <div class="sub" data-date></div>
-      <div class="sub">8° Cloudy</div>
+
+  <!-- HOME -->
+  <section id="home" class="screen home">
+    <div class="wallpaper"></div>
+
+    <div class="hud">
+      <div class="clockBig">
+        <div class="h" data-hh>11</div>
+        <div class="m" data-mm>05</div>
+      </div>
+      <div class="hudRight">
+        <div class="day">Friday</div>
+        <div class="monthRow"><span class="month">December</span> <span class="dateNum">19</span></div>
+        <div class="weatherRow">
+          <div class="wMain">Cloudy</div>
+          <div class="wRange">8° • 5°</div>
+          <div class="wNow">8°</div>
+        </div>
+      </div>
     </div>
-    <div class="hint">Tap to wake • Swipe up</div>
+
+    <div class="homeWidgets">
+      <div class="wTile media">
+        <div class="thumb"></div>
+        <div class="wText">
+          <div class="wTitle">Christmas</div>
+          <div class="wTitle">Market Fun</div>
+          <div class="wSub">▶ 2025</div>
+        </div>
+      </div>
+
+      <div class="wTile pillGrad"></div>
+
+      <div class="wActions">
+        <button class="fab orange" data-open="search">🔎</button>
+        <button class="fab blue" data-open="connect">✉️</button>
+      </div>
+    </div>
+
+    <div class="agenda">
+      <div class="agendaHead">Tuesday 16ᵗʰ December</div>
+      <div class="agendaBody">
+        <div class="row dim">No events today</div>
+        <div class="row">Tomorrow, 09:00 - 10:00: DPD Delivery Expected</div>
+        <div class="row">Friday, 09:00 - 17:30: Lia @ Work</div>
+        <div class="row">Saturday, 09:00 - 14:30: Lia @ Work</div>
+      </div>
+      <button class="agendaAdd">+</button>
+    </div>
+
+    <div class="homeDock" id="homeDock"></div>
+
+    <div class="homeSearch" id="homeSearch">
+      <span class="magnify">🔍</span>
+      <span class="txt">Search Everything</span>
+    </div>
   </section>
 
-  <!-- Lock -->
-  <section id="lock" class="screen hidden">
-    <div class="bg blur dim"></div>
-    <div class="stack">
-      <div class="time" data-time></div>
-      <div class="sub" data-date></div>
-      <div class="sub">8° Cloudy</div>
-    </div>
-
-    <div class="corner left">↖︎ Notifs</div>
-    <div class="corner right">QS ↗︎</div>
-    <div class="hint">Swipe up to unlock</div>
-  </section>
-
-  <!-- Home -->
-  <section id="home" class="screen">
-    <div class="bg"></div>
-
-    <div id="floatables">
-      <div class="floatable" data-f="clock"><div class="time" data-time></div></div>
-      <div class="floatable" data-f="date" style="top:120px;"><div class="sub" data-date></div></div>
-      <div class="floatable" data-f="weather" style="top:152px;"><div class="sub">8° Cloudy</div></div>
-    </div>
-
-    <div id="grid" class="grid"></div>
-
-    <div id="live" class="live hidden">
-      <div class="dot"></div>
-      <div class="liveText">Now playing</div>
-      <button id="liveExpand" class="icon">▴</button>
-    </div>
-
-    <div id="dock" class="dock"></div>
-
-    <div class="bar">
-      <button id="menuBtn" class="icon">≡</button>
-      <button id="searchBtn" class="search">Search</button>
-      <button id="npBtn" class="icon" title="Collapsed now playing">◍</button>
-    </div>
-  </section>
-
-  <!-- Drawer -->
-  <section id="drawer" class="screen hidden panel">
+  <!-- APP DRAWER -->
+  <section id="drawer" class="screen panel hidden">
     <div class="panelHead">
       <div class="title">Apps</div>
       <div class="sub">Swipe down to return</div>
@@ -72,17 +78,8 @@
     <div class="apps" id="appsGrid"></div>
   </section>
 
-  <!-- Widgets -->
-  <section id="widgets" class="screen hidden panel">
-    <div class="panelHead">
-      <div class="title">Widget Hub</div>
-      <div class="sub">Swipe right to return • Tap to add</div>
-    </div>
-    <div class="list" id="widgetList"></div>
-  </section>
-
-  <!-- Connect -->
-  <section id="connect" class="screen hidden panel">
+  <!-- CONNECT HUB -->
+  <section id="connect" class="screen panel hidden">
     <div class="panelHead">
       <div class="title">Connect Hub</div>
       <div class="sub">Unified inbox • Tap title for full view</div>
@@ -90,69 +87,113 @@
     <div class="list" id="connectList"></div>
   </section>
 
-  <!-- Overview -->
-  <section id="overview" class="screen hidden panel">
-    <div class="panelHead">
-      <div class="title">Overview</div>
-      <div class="sub">Swipe up to return • Swipe left/right for Spaces</div>
+  <!-- MUSIC APP -->
+  <section id="music" class="screen music hidden">
+    <div class="musicGrid" id="musicGrid"></div>
+
+    <!-- Bottom bar (Fibre app bar, music-themed) -->
+    <div class="musicBar" id="musicBar">
+      <button class="mCircle mint" id="musicMenuBtn" aria-label="Music menu">≡</button>
+      <div class="mSearch" id="musicSearchBtn">
+        <span class="mIcon">🔍</span>
+        <span class="mHint" id="musicSearchHint">Search Music</span>
+        <span class="mValue" id="musicSearchValue"></span>
+      </div>
     </div>
-    <div class="spaces" id="spaces"></div>
-    <div class="list" id="recents"></div>
+
+    <!-- Expanded nav row (like your mt1-2) -->
+    <div class="musicNav hidden" id="musicNav">
+      <div class="navRow">
+        <button class="mCircle mint" id="musicCloseNav" aria-label="Close music nav">✕</button>
+        <div class="mSearch wide" id="musicSearchBtn2">
+          <span class="mIcon">🔍</span>
+          <span class="mHint">Search Music</span>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active">Home</button>
+        <button class="tab">For You</button>
+        <button class="tab">Music</button>
+        <button class="tab">Podcasts</button>
+        <button class="tab">Radio</button>
+        <button class="tab">Library</button>
+        <button class="tab">Browse</button>
+      </div>
+    </div>
+
+    <!-- Now Playing (collapsed) -->
+    <div class="nowPlaying" id="nowPlaying">
+      <div class="art"></div>
+      <div class="npText">
+        <div class="npTitle" id="npTitle">Last Christmas</div>
+        <div class="npArtist" id="npArtist">Wham!</div>
+      </div>
+      <div class="npControls">
+        <button class="npBtn" id="prevBtn">⏮</button>
+        <button class="npBtn" id="playBtn">⏸</button>
+        <button class="npBtn" id="nextBtn">⏭</button>
+      </div>
+    </div>
+
+    <!-- Full player sheet -->
+    <div class="player hidden" id="player">
+      <div class="playerTop">
+        <button class="pillBtn" id="playerClose">Close</button>
+        <div class="pTitle">Now Playing</div>
+        <div style="width:70px"></div>
+      </div>
+      <div class="playerArt"></div>
+      <div class="playerMeta">
+        <div class="big" id="pTrack">Last Christmas</div>
+        <div class="sub2" id="pArtist">Wham!</div>
+      </div>
+      <div class="seek">
+        <input id="seek" type="range" min="0" max="100" value="25"/>
+        <div class="seekRow"><span id="tCur">0:58</span><span id="tEnd">3:52</span></div>
+      </div>
+      <div class="playerControls">
+        <button class="ctl" id="pPrev">⏮</button>
+        <button class="ctl bigCtl" id="pPlay">⏸</button>
+        <button class="ctl" id="pNext">⏭</button>
+      </div>
+      <div class="queue">
+        <div class="qHead">Up next</div>
+        <div class="qItem"><span>Everything She Wants</span><span class="muted">Wham!</span></div>
+        <div class="qItem"><span>Careless Whisper</span><span class="muted">George Michael</span></div>
+        <div class="qItem"><span>Wake Me Up Before You Go‑Go</span><span class="muted">Wham!</span></div>
+      </div>
+    </div>
+
+    <!-- Search overlay (music keyboard style) -->
+    <div class="searchOverlay hidden" id="musicSearch">
+      <div class="musicSearchTop">
+        <button class="mCircle mint" id="musicBackSearch" aria-label="Back">←</button>
+        <div class="mSearch wide active" id="musicSearchField">
+          <span class="mIcon">🔍</span>
+          <span class="mCursor">|</span>
+          <span class="mHint faint" id="musicSearchPh">Search Music</span>
+          <span class="mValue" id="musicQuery"></span>
+        </div>
+      </div>
+      <div class="searchResults" id="musicResults"></div>
+      <div class="kbd">
+        <div class="kbdRow" data-row="1"></div>
+        <div class="kbdRow" data-row="2"></div>
+        <div class="kbdRow" data-row="3"></div>
+        <div class="kbdBottom">
+          <button class="kKey wide" data-key="sym">sym</button>
+          <button class="kKey space" data-key="space">space</button>
+          <button class="kKey wide" data-key=".">.</button>
+          <button class="kKey wide" data-key="search">search</button>
+        </div>
+      </div>
+    </div>
+
   </section>
 
-  <!-- Notifs shade -->
-  <aside id="notifs" class="shade hidden">
-    <div class="shadeHead">Notifications (redacted)</div>
-    <div class="list" id="notifList"></div>
-    <div class="sub pad">Swipe down to close</div>
-  </aside>
-
-  <!-- Quick settings shade -->
-  <aside id="qs" class="shade hidden">
-    <div class="shadeHead">Quick Settings</div>
-    <div class="list pad">
-      <div class="row"><span>Wi‑Fi</span><button class="pill">On</button></div>
-      <div class="row"><span>Bluetooth</span><button class="pill">Off</button></div>
-      <div class="row"><span>DND</span><button class="pill">Off</button></div>
-      <div class="row"><span>Brightness</span><input type="range" value="70"/></div>
-    </div>
-    <div class="sub pad">Swipe down to close</div>
-  </aside>
-
-  <!-- System sheet -->
-  <aside id="sheet" class="sheet hidden">
-    <div class="sheetHead">
-      <div class="title">System</div>
-      <button id="sheetClose" class="icon">✕</button>
-    </div>
-    <div class="list pad">
-      <button id="editBtn" class="btn">Customise Home</button>
-      <button id="liveBtn" class="btn">Toggle Live Activity</button>
-      <button id="lockBtn" class="btn">Lock</button>
-    </div>
-  </aside>
-
-  <!-- Edit overlay -->
-  <div id="edit" class="edit hidden">
-    <div class="pill">Edit mode • Drag clock/date/weather</div>
-    <button id="doneBtn" class="pill big">Done</button>
-  </div>
-
-  <!-- Search overlay -->
-  <div id="search" class="searchOverlay hidden">
-    <div class="results" id="results"></div>
-    <div class="searchRow">
-      <button id="scope" class="pill small">In‑app</button>
-      <input id="q" placeholder="Search"/>
-    </div>
-    <div class="kbd">
-      <div class="kbdRow">Q W E R T Y U I O P</div>
-      <div class="kbdRow">A S D F G H J K L</div>
-      <div class="kbdRow"><button data-k="space" class="pill small">Space</button><button data-k="back" class="pill small">⌫</button></div>
-    </div>
-  </div>
-
+  <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
+
 </div>
 
 <script src="app.js"></script>
