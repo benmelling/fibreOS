@@ -169,3 +169,70 @@ button,input{font:inherit}
 .wTile.media{border:0; padding:0; text-align:left}
 .homeSearch{border:0; cursor:pointer}
 .musicBg{position:absolute; inset:0; background:linear-gradient(180deg, rgba(208,25,92,.85), rgba(10,0,0,.75));}
+
+/* Prevent pull-to-refresh / overscroll reload */
+html, body { height:100%; overflow:hidden; overscroll-behavior-y: none; }
+#appShell{ position:fixed; inset:0; background:#050509; }
+.scrollable{ overflow:auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+
+/* Capsule: keep same size when unfolded (Pixel 9 Pro Fold) */
+.capsule{
+  position:absolute;
+  left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  width:min(430px, 100vw);
+  height:min(940px, 100vh);
+  border-radius:44px;
+  overflow:hidden;
+  background:#0b0b0f;
+  box-shadow:0 40px 120px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.08);
+}
+
+/* When narrow (folded / normal phones): capsule fills screen */
+@media (max-width: 520px){
+  .capsule{
+    left:0; top:0; transform:none;
+    width:100vw; height:100vh; border-radius:0;
+    box-shadow:none;
+  }
+}
+
+/* Add subtle outer backdrop when unfolded */
+@media (min-width: 521px){
+  #appShell{
+    background:
+      radial-gradient(1000px 700px at 50% 10%, rgba(208,25,92,.20), transparent 60%),
+      radial-gradient(900px 650px at 20% 70%, rgba(72,245,210,.14), transparent 60%),
+      linear-gradient(180deg, #050509, #000);
+  }
+}
+
+/* System bar */
+.sysbar{
+  position:absolute;
+  left:0; right:0;
+  top:0;
+  height:calc(36px + var(--safe-t));
+  padding:calc(10px + var(--safe-t)) 16px 8px;
+  display:flex; align-items:flex-end; justify-content:space-between;
+  z-index:40;
+  color:rgba(255,255,255,.9);
+  pointer-events:none;
+}
+.sys-left, .sys-right{display:flex; gap:10px; align-items:center}
+.sys-time{font-weight:900; letter-spacing:-.02em}
+.sys-ic{opacity:.85; font-size:14px}
+
+/* Make screens respect sysbar + home indicator padding */
+.screen{ padding-top:calc(14px + var(--safe-t) + 34px); padding-bottom:calc(22px + var(--safe-b)); }
+.homeIndicator{
+  position:absolute; left:50%; transform:translateX(-50%);
+  bottom:calc(8px + var(--safe-b));
+  width:128px; height:5px; border-radius:999px;
+  background:rgba(255,255,255,.22);
+  z-index:50;
+  pointer-events:none;
+}
+
+/* Better touch targets */
+button{ -webkit-tap-highlight-color: transparent; }

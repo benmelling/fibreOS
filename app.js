@@ -1,6 +1,6 @@
 
 const $ = (id)=>document.getElementById(id);
-const screens = ["home","drawer","connect","music"];
+const screens = ["home","drawer","widgets","connect","music"];
 const state = {
   surface:"home",
   apps:["Music","Browser","Messages","Camera","Photos","Settings","Files","Notes","Connect"],
@@ -91,6 +91,18 @@ function renderConnect(){
   });
 }
 renderConnect();
+
+function renderWidgets(){
+  const list=$("widgetList"); list.innerHTML="";
+  ["Now Playing","Calendar","Weather","Files","Photos","Smart Home"].forEach(w=>{
+    const c=document.createElement("div"); c.className="card";
+    c.innerHTML=`<div class="cardTitle">${w}</div><div class="sub">Tap to add to Home (mock)</div>`;
+    c.onclick=()=>toast("Add widget: "+w);
+    list.appendChild(c);
+  });
+}
+renderWidgets();
+
 
 function renderMusicGrid(){
   const grid=$("musicGrid"); grid.innerHTML="";
@@ -243,11 +255,31 @@ document.addEventListener("touchend",(e)=>{
   if(state.surface==="home"){
     if(dir==="up") show("drawer");
     if(dir==="left") show("connect");
+    if(dir==="right") show("widgets");
     if(dir==="down") show("music"); // demo shortcut
   } else if(state.surface==="drawer"){
-    if(dir==="down") show("home");
-  } else if(state.surface==="connect"){
+    if(dir==="down") 
+// Prevent Android Chrome pull-to-refresh within the capsule
+let _ptrY = null;
+document.addEventListener("touchstart",(e)=>{
+  _ptrY = e.touches[0].clientY;
+},{passive:true});
+document.addEventListener("touchmove",(e)=>{
+  if(_ptrY===null) return;
+  const y = e.touches[0].clientY;
+  const dy = y - _ptrY;
+  // If pulling down from very top of capsule, block browser refresh
+  const atTop = (document.scrollingElement ? document.scrollingElement.scrollTop : 0) === 0;
+  if(atTop && dy > 0 && _ptrY < 70){
+    e.preventDefault();
+  }
+},{passive:false});
+
+show("home");
+  } else if(state.surface==="widgets"){
     if(dir==="right") show("home");
+  } else if(state.surface==="connect"){
+    if(dir==="left") show("home");
   } else if(state.surface==="music"){
     if(dir==="right") show("home");
   }
