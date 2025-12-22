@@ -1,4 +1,16 @@
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+// v2.9.1: disable service worker to avoid caching glitches while iterating
+(async ()=>{
+  try{
+    if('serviceWorker' in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+    if('caches' in window){
+      const keys = await caches.keys();
+      await Promise.all(keys.filter(k=>k.startsWith('fibreos-clean-')).map(k=>caches.delete(k)));
+    }
+  }catch(e){}
+})();
 
 const $=(q,el=document)=>el.querySelector(q);
 const $$=(q,el=document)=>Array.from(el.querySelectorAll(q));
