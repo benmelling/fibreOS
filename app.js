@@ -1,4 +1,4 @@
-// v2.9.1: disable service worker to avoid caching glitches while iterating
+// v2.9.2: disable service worker to avoid caching glitches while iterating
 (async ()=>{
   try{
     if('serviceWorker' in navigator){

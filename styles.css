@@ -26,11 +26,10 @@ button{border:0;background:none;color:inherit}
 /* Content above capsule */
 .content{
   position:absolute; inset:0;
-  position: relative;
   padding:calc(var(--safe-t) + 22px) var(--pad) calc(var(--capsule-h) + var(--safe-b) + 16px);
   overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
 }
-.screen{position:absolute;inset:0;display:none}
+.screen{display:none}
 .screen.is-active{display:block}
 
 /* HERO layout */
