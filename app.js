@@ -192,4 +192,117 @@ setInterval(tickTime, 15000);
 updateWeather();
 setInterval(updateWeather, 600000);
 initBattery();
+
+// --- Gesture nav testing (Home panels) ---
+const panels = {
+  left: document.getElementById('panelLeft'),
+  right: document.getElementById('panelRight'),
+  top: document.getElementById('panelTop'),
+  bottom: document.getElementById('panelBottom'),
+};
+function closePanels(){
+  Object.values(panels).forEach(p=>p && p.classList.remove('is-open'));
+}
+function anyPanelOpen(){
+  return Object.values(panels).some(p=>p && p.classList.contains('is-open'));
+}
+function openPanel(which){
+  closePanels();
+  const p = panels[which];
+  if(p) p.classList.add('is-open');
+}
+Object.values(panels).forEach(p=>{
+  if(!p) return;
+  p.addEventListener('click', (e)=>{
+    // tap outside card closes
+    if(e.target === p) closePanels();
+  });
+});
+
+// Drawer buttons navigate
+document.querySelectorAll('.drawerApp').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const go=b.getAttribute('data-go');
+    closePanels();
+    if(go==='lock'){ resetPin(); show('aod'); return; }
+    show(go);
+  });
+});
+
+let touchStart=null;
+function onStart(e){
+  if(active==='lock' || active==='aod') return; // keep PIN/AOD simple
+  const t = (e.touches && e.touches[0]) ? e.touches[0] : e;
+  touchStart = {x:t.clientX, y:t.clientY, time:Date.now()};
+}
+function onEnd(e){
+  if(!touchStart) return;
+  if(active==='lock' || active==='aod') { touchStart=null; return; }
+  const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : e;
+  const dx = t.clientX - touchStart.x;
+  const dy = t.clientY - touchStart.y;
+  const adx = Math.abs(dx), ady=Math.abs(dy);
+  const dt = Date.now()-touchStart.time;
+  touchStart=null;
+
+  // If a panel is open, interpret opposite close directions:
+  // Widgets: open L->R, close R->L
+  // Connect: open R->L, close L->R
+  // Multitasking: open T->B, close B->T
+  // App drawer: open B->T, close T->B
+  const threshold = 56;
+  const fast = dt < 500;
+
+  const closeBy = (which)=>{
+    if(panels[which] && panels[which].classList.contains('is-open')) closePanels();
+  };
+
+  if(anyPanelOpen()){
+    if(adx>ady && adx>threshold){
+      if(dx<0) closeBy('left');    // R->L closes left
+      if(dx>0) closeBy('right');   // L->R closes right
+    }else if(ady>adx && ady>threshold){
+      if(dy<0) closeBy('top');     // B->T closes top
+      if(dy>0) closeBy('bottom');  // T->B closes bottom
+    }
+    return;
+  }
+
+  // Home-only opens panels (global gestures can be expanded later)
+  if(active==='home'){
+    if(adx>ady && adx>threshold){
+      if(dx>0) openPanel('left');      // L->R opens Widgets
+      else openPanel('right');         // R->L opens Connect
+      return;
+    }
+    if(ady>adx && ady>threshold){
+      if(dy>0) openPanel('top');       // T->B opens Multitasking
+      else openPanel('bottom');        // B->T opens App drawer
+      return;
+    }
+  }
+}
+// attach to content area so it doesn't fight browser chrome too much
+document.getElementById('content').addEventListener('touchstart', onStart, {passive:true});
+document.getElementById('content').addEventListener('touchend', onEnd, {passive:true});
+
+// Home bar: tap OR swipe up from capsule returns Home (from any app)
+const homeBar = document.querySelector('.homeBar');
+if(homeBar){
+  homeBar.addEventListener('click', ()=>{ closePanels(); show('home'); });
+}
+let capStart=null;
+document.getElementById('capsule').addEventListener('touchstart', (e)=>{
+  const t=e.touches[0];
+  capStart={x:t.clientX,y:t.clientY,time:Date.now()};
+},{passive:true});
+document.getElementById('capsule').addEventListener('touchend', (e)=>{
+  if(!capStart) return;
+  const t=e.changedTouches[0];
+  const dy=t.clientY-capStart.y;
+  const ady=Math.abs(dy);
+  capStart=null;
+  if(ady>48 && dy<0){ closePanels(); show('home'); }
+},{passive:true});
+
 show("home");

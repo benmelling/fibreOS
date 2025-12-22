@@ -4,9 +4,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <meta name="theme-color" content="#0a0a10"/>
-  <title>FibreOS Clean v2.9.2</title>
+  <title>FibreOS Clean v2.9.3</title>
   <link rel="manifest" href="manifest.json"/>
-  <link rel="stylesheet" href="styles.css?v=292"/>
+  <link rel="stylesheet" href="styles.css?v=293"/>
 </head>
 <body>
 <div id="app" class="app">
@@ -132,6 +132,59 @@
         <div class="aodHint">Tap to wake</div>
       </div>
     </section>
+  
+    <!-- NAV TEST PANELS (Home only) -->
+    <div id="panelLeft" class="panel panel-left" aria-label="Widgets panel">
+      <div class="panelCard">
+        <div class="panelTitle">Widgets</div>
+        <div class="panelSub">Swipe right-to-left to close</div>
+        <div class="panelBody">
+          <div class="panelPill">Weather widget</div>
+          <div class="panelPill">Calendar widget</div>
+          <div class="panelPill">Now Playing widget</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panelRight" class="panel panel-right" aria-label="Connect panel">
+      <div class="panelCard">
+        <div class="panelTitle">Connect Hub</div>
+        <div class="panelSub">Swipe left-to-right to close</div>
+        <div class="panelBody">
+          <div class="panelPill">Lia · WhatsApp</div>
+          <div class="panelPill">Mum · RCS</div>
+          <div class="panelPill">VP Trade Team · Slack</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panelTop" class="panel panel-top" aria-label="Multitasking panel">
+      <div class="panelCard">
+        <div class="panelTitle">Multitasking</div>
+        <div class="panelSub">Swipe bottom-to-top to close</div>
+        <div class="panelBody">
+          <div class="panelPill">Running: Music</div>
+          <div class="panelPill">Running: Search</div>
+          <div class="panelPill">Running: Settings</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panelBottom" class="panel panel-bottom" aria-label="App drawer panel">
+      <div class="panelCard">
+        <div class="panelTitle">App Drawer</div>
+        <div class="panelSub">Swipe top-to-bottom to close</div>
+        <div class="panelBody drawerGrid">
+          <button class="drawerApp" data-go="music">🎵<span>Music</span></button>
+          <button class="drawerApp" data-go="home">🏠<span>Home</span></button>
+          <button class="drawerApp" data-go="lock">🔒<span>Lock</span></button>
+          <button class="drawerApp" data-go="home">⚙️<span>Settings</span></button>
+          <button class="drawerApp" data-go="home">🔎<span>Search</span></button>
+          <button class="drawerApp" data-go="home">🧩<span>Widgets</span></button>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- FIXED FIBRE CAPSULE -->
@@ -168,6 +221,6 @@
 </div>
 
 <script>window.__COVERS__ = ["assets/cover_00.png", "assets/cover_01.png", "assets/cover_02.png", "assets/cover_03.png", "assets/cover_04.png", "assets/cover_05.png", "assets/cover_06.png", "assets/cover_07.png", "assets/cover_08.png", "assets/cover_09.png", "assets/cover_10.png", "assets/cover_11.png", "assets/cover_12.png", "assets/cover_13.png", "assets/cover_14.png", "assets/cover_15.png"];</script>
-<script src="app.js?v=292"></script>
+<script src="app.js?v=293"></script>
 </body>
 </html>
