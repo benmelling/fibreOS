@@ -4,12 +4,13 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <meta name="theme-color" content="#0b0b0f"/>
-  <title>FibreOS Prototype v2</title>
+  <title>FibreOS Prototype v2.1</title>
   <link rel="manifest" href="manifest.json"/>
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
 <div id="root">
+  <div id="debug" class="debug">home</div>
 
   <!-- HOME -->
   <section id="home" class="screen home">
@@ -32,20 +33,20 @@
     </div>
 
     <div class="homeWidgets">
-      <div class="wTile media">
+      <button class="wTile media" id="openMusicTile" aria-label="Open Music">
         <div class="thumb"></div>
         <div class="wText">
           <div class="wTitle">Christmas</div>
           <div class="wTitle">Market Fun</div>
-          <div class="wSub">▶ 2025</div>
+          <div class="wSub">Tap to open Music</div>
         </div>
-      </div>
+      </button>
 
       <div class="wTile pillGrad"></div>
 
       <div class="wActions">
-        <button class="fab orange" data-open="search">🔎</button>
-        <button class="fab blue" data-open="connect">✉️</button>
+        <button class="fab orange" data-open="search" aria-label="Search">🔎</button>
+        <button class="fab blue" data-open="connect" aria-label="Connect">✉️</button>
       </div>
     </div>
 
@@ -62,10 +63,10 @@
 
     <div class="homeDock" id="homeDock"></div>
 
-    <div class="homeSearch" id="homeSearch">
+    <button class="homeSearch" id="homeSearch">
       <span class="magnify">🔍</span>
       <span class="txt">Search Everything</span>
-    </div>
+    </button>
   </section>
 
   <!-- APP DRAWER -->
@@ -89,39 +90,37 @@
 
   <!-- MUSIC APP -->
   <section id="music" class="screen music hidden">
+    <div class="musicBg"></div>
     <div class="musicGrid" id="musicGrid"></div>
 
-    <!-- Bottom bar (Fibre app bar, music-themed) -->
     <div class="musicBar" id="musicBar">
       <button class="mCircle mint" id="musicMenuBtn" aria-label="Music menu">≡</button>
-      <div class="mSearch" id="musicSearchBtn">
+      <button class="mSearch" id="musicSearchBtn" aria-label="Search Music">
         <span class="mIcon">🔍</span>
         <span class="mHint" id="musicSearchHint">Search Music</span>
         <span class="mValue" id="musicSearchValue"></span>
-      </div>
+      </button>
     </div>
 
-    <!-- Expanded nav row (like your mt1-2) -->
     <div class="musicNav hidden" id="musicNav">
       <div class="navRow">
         <button class="mCircle mint" id="musicCloseNav" aria-label="Close music nav">✕</button>
-        <div class="mSearch wide" id="musicSearchBtn2">
+        <button class="mSearch wide" id="musicSearchBtn2" aria-label="Search Music">
           <span class="mIcon">🔍</span>
           <span class="mHint">Search Music</span>
-        </div>
+        </button>
       </div>
-      <div class="tabs">
-        <button class="tab active">Home</button>
-        <button class="tab">For You</button>
-        <button class="tab">Music</button>
-        <button class="tab">Podcasts</button>
-        <button class="tab">Radio</button>
-        <button class="tab">Library</button>
-        <button class="tab">Browse</button>
+      <div class="tabs" id="musicTabs">
+        <button class="tab active" data-tab="home">Home</button>
+        <button class="tab" data-tab="foryou">For You</button>
+        <button class="tab" data-tab="music">Music</button>
+        <button class="tab" data-tab="podcasts">Podcasts</button>
+        <button class="tab" data-tab="radio">Radio</button>
+        <button class="tab" data-tab="library">Library</button>
+        <button class="tab" data-tab="browse">Browse</button>
       </div>
     </div>
 
-    <!-- Now Playing (collapsed) -->
     <div class="nowPlaying" id="nowPlaying">
       <div class="art"></div>
       <div class="npText">
@@ -129,18 +128,17 @@
         <div class="npArtist" id="npArtist">Wham!</div>
       </div>
       <div class="npControls">
-        <button class="npBtn" id="prevBtn">⏮</button>
-        <button class="npBtn" id="playBtn">⏸</button>
-        <button class="npBtn" id="nextBtn">⏭</button>
+        <button class="npBtn" id="prevBtn" aria-label="Previous">⏮</button>
+        <button class="npBtn" id="playBtn" aria-label="Play/Pause">⏸</button>
+        <button class="npBtn" id="nextBtn" aria-label="Next">⏭</button>
       </div>
     </div>
 
-    <!-- Full player sheet -->
     <div class="player hidden" id="player">
       <div class="playerTop">
         <button class="pillBtn" id="playerClose">Close</button>
         <div class="pTitle">Now Playing</div>
-        <div style="width:70px"></div>
+        <button class="pillBtn" id="playerBackHome">Home</button>
       </div>
       <div class="playerArt"></div>
       <div class="playerMeta">
@@ -164,11 +162,10 @@
       </div>
     </div>
 
-    <!-- Search overlay (music keyboard style) -->
     <div class="searchOverlay hidden" id="musicSearch">
       <div class="musicSearchTop">
         <button class="mCircle mint" id="musicBackSearch" aria-label="Back">←</button>
-        <div class="mSearch wide active" id="musicSearchField">
+        <div class="mSearch wide active" id="musicSearchField" aria-label="Search field">
           <span class="mIcon">🔍</span>
           <span class="mCursor">|</span>
           <span class="mHint faint" id="musicSearchPh">Search Music</span>
@@ -191,11 +188,8 @@
 
   </section>
 
-  <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
-
 </div>
-
 <script src="app.js"></script>
 </body>
 </html>

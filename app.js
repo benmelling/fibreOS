@@ -3,25 +3,26 @@ const $ = (id)=>document.getElementById(id);
 const screens = ["home","drawer","connect","music"];
 const state = {
   surface:"home",
-  pinned:["music","home","photos","camera"],
   apps:["Music","Browser","Messages","Camera","Photos","Settings","Files","Notes","Connect"],
   music:{
     playing:true,
     track:{title:"Last Christmas", artist:"Wham!"},
-    query:""
+    query:"",
+    tab:"home"
   }
 };
 
+function setDebug(){ const d=$("debug"); if(d) d.textContent = state.surface + (state.surface==="music" ? `:${state.music.tab}`:""); }
 function show(id){
   screens.forEach(s=>$(s).classList.toggle("hidden", s!==id));
   state.surface=id;
+  setDebug();
+  location.hash = id; // makes refresh land on same screen
 }
-
 function toast(msg){
   const t=$("toast"); t.textContent=msg; t.classList.remove("hidden");
   clearTimeout(toast._tm); toast._tm=setTimeout(()=>t.classList.add("hidden"), 1200);
 }
-
 function tick(){
   const d=new Date();
   const hh=String(d.getHours()).padStart(2,"0");
@@ -31,20 +32,34 @@ function tick(){
 }
 setInterval(tick, 5000); tick();
 
+function wireHome(){
+  $("openMusicTile").onclick=()=>show("music");
+  $("homeSearch").onclick=()=>toast("Search Everything (mock)");
+  document.querySelectorAll(".fab").forEach(b=>{
+    b.onclick=()=>{
+      const open=b.dataset.open;
+      if(open==="connect") show("connect");
+      else toast("Search (mock)");
+    };
+  });
+}
+wireHome();
+
 function renderHomeDock(){
   const dock=$("homeDock");
   dock.innerHTML="";
   const icons=[
-    {k:"music", cls:"music", glyph:"♪", open:"music"},
-    {k:"home", cls:"home", glyph:"⌂", open:"home"},
-    {k:"photos", cls:"photos", glyph:"🖼️", open:null},
-    {k:"camera", cls:"camera", glyph:"📷", open:null},
+    {cls:"music", glyph:"♪", open:"music"},
+    {cls:"home", glyph:"⌂", open:"home"},
+    {cls:"photos", glyph:"🖼️"},
+    {cls:"camera", glyph:"📷"},
   ];
   icons.forEach(i=>{
     const b=document.createElement("button");
     b.className="dIcon "+i.cls;
+    b.type="button";
     b.textContent=i.glyph;
-    b.onclick=()=>{ if(i.open) show(i.open); else toast(i.k); };
+    b.onclick=()=>{ i.open ? show(i.open) : toast(i.glyph); };
     dock.appendChild(b);
   });
 }
@@ -53,13 +68,13 @@ renderHomeDock();
 function renderDrawer(){
   const pr=$("pinnedRow"); pr.innerHTML="";
   ["Music","Browser","Messages","Camera"].forEach(a=>{
-    const x=document.createElement("div"); x.className="app"; x.textContent=a[0];
+    const x=document.createElement("button"); x.className="app"; x.type="button"; x.textContent=a[0];
     x.onclick=()=>{ if(a==="Music") show("music"); else toast("Open "+a); };
     pr.appendChild(x);
   });
   const ag=$("appsGrid"); ag.innerHTML="";
   state.apps.forEach(a=>{
-    const x=document.createElement("div"); x.className="app"; x.textContent=a[0];
+    const x=document.createElement("button"); x.className="app"; x.type="button"; x.textContent=a[0];
     x.onclick=()=>{ if(a==="Music") show("music"); else if(a==="Connect") show("connect"); else toast("Open "+a); };
     ag.appendChild(x);
   });
@@ -79,8 +94,16 @@ renderConnect();
 
 function renderMusicGrid(){
   const grid=$("musicGrid"); grid.innerHTML="";
-  // make 8 squares like your sample
-  const colors=["#ffe548","#5e2ea6","#b0125a","#f06452","#49a84d","#53c6ff","#3e51b5","#ff9dbf"];
+  const palettes = {
+    home:["#ffe548","#5e2ea6","#b0125a","#f06452","#49a84d","#53c6ff","#3e51b5","#ff9dbf"],
+    foryou:["#ff9dbf","#ffe548","#53c6ff","#49a84d","#f06452","#5e2ea6","#3e51b5","#b0125a"],
+    music:["#53c6ff","#3e51b5","#49a84d","#ffe548","#f06452","#ff9dbf","#5e2ea6","#b0125a"],
+    podcasts:["#5e2ea6","#3e51b5","#53c6ff","#ffe548","#ff9dbf","#b0125a","#f06452","#49a84d"],
+    radio:["#49a84d","#ffe548","#f06452","#53c6ff","#3e51b5","#5e2ea6","#b0125a","#ff9dbf"],
+    library:["#b0125a","#ff9dbf","#f06452","#ffe548","#49a84d","#53c6ff","#3e51b5","#5e2ea6"],
+    browse:["#f06452","#49a84d","#53c6ff","#3e51b5","#5e2ea6","#b0125a","#ff9dbf","#ffe548"],
+  };
+  const colors = palettes[state.music.tab] || palettes.home;
   for(let i=0;i<8;i++){
     const d=document.createElement("div");
     d.className="mSq";
@@ -95,15 +118,12 @@ function setPlaying(on){
   $("playBtn").textContent = on ? "⏸" : "▶";
   $("pPlay").textContent = on ? "⏸" : "▶";
 }
-
 function openPlayer(){ $("player").classList.remove("hidden"); }
 function closePlayer(){ $("player").classList.add("hidden"); }
 
-$("nowPlaying").onclick = (e)=>{
-  if(e.target.closest(".npBtn")) return;
-  openPlayer();
-};
+$("nowPlaying").onclick=(e)=>{ if(e.target.closest(".npBtn")) return; openPlayer(); };
 $("playerClose").onclick=closePlayer;
+$("playerBackHome").onclick=()=>{ closePlayer(); $("musicNav").classList.add("hidden"); };
 
 $("prevBtn").onclick=()=>toast("Prev");
 $("nextBtn").onclick=()=>toast("Next");
@@ -112,27 +132,35 @@ $("pPrev").onclick=()=>toast("Prev");
 $("pNext").onclick=()=>toast("Next");
 $("pPlay").onclick=()=>setPlaying(!state.music.playing);
 
-// Nav open/close
-$("musicMenuBtn").onclick=()=>{ $("musicNav").classList.remove("hidden"); };
-$("musicCloseNav").onclick=()=>{ $("musicNav").classList.add("hidden"); };
+$("musicMenuBtn").onclick=()=>$("musicNav").classList.remove("hidden");
+$("musicCloseNav").onclick=()=>$("musicNav").classList.add("hidden");
 
-// Music search overlay
+// Tabs now actually change content + active state
+$("musicTabs").onclick=(e)=>{
+  const btn=e.target.closest(".tab");
+  if(!btn) return;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  btn.classList.add("active");
+  state.music.tab = btn.dataset.tab || "home";
+  renderMusicGrid();
+  toast("Tab: "+btn.textContent);
+};
+
+// Search overlay
 function openMusicSearch(){
   $("musicSearch").classList.remove("hidden");
   state.music.query="";
   $("musicQuery").textContent="";
+  $("musicSearchPh").classList.remove("hidden");
   renderMusicResults("");
 }
-function closeMusicSearch(){
-  $("musicSearch").classList.add("hidden");
-}
+function closeMusicSearch(){ $("musicSearch").classList.add("hidden"); }
 $("musicSearchBtn").onclick=openMusicSearch;
 $("musicSearchBtn2").onclick=openMusicSearch;
 $("musicBackSearch").onclick=closeMusicSearch;
 
 function renderMusicResults(q){
-  const box=$("musicResults");
-  box.innerHTML="";
+  const box=$("musicResults"); box.innerHTML="";
   const tracks=[
     {t:"Last Christmas", a:"Wham!"},
     {t:"Everything She Wants", a:"Wham!"},
@@ -166,23 +194,15 @@ function renderMusicResults(q){
 }
 
 function typeKey(k){
-  if(k==="back"){
-    state.music.query = state.music.query.slice(0,-1);
-  }else if(k==="space"){
-    state.music.query += " ";
-  }else if(k==="search"){
-    // no-op; keep results live
-  }else if(k==="sym"){
-    toast("Symbols (mock)");
-  }else{
-    state.music.query += k;
-  }
+  if(k==="back") state.music.query = state.music.query.slice(0,-1);
+  else if(k==="space") state.music.query += " ";
+  else if(k==="search") {/* live */}
+  else if(k==="sym") toast("Symbols (mock)");
+  else state.music.query += k;
   $("musicQuery").textContent = state.music.query;
   $("musicSearchPh").classList.toggle("hidden", state.music.query.length>0);
   renderMusicResults(state.music.query);
 }
-
-// keyboard rows
 const row1="1234567890".split("");
 const row2="qwertyuiop".split("");
 const row3="asdfghjkl".split("");
@@ -192,7 +212,8 @@ function fillRow(rowId, keys){
   keys.forEach(k=>{
     const b=document.createElement("button");
     b.className="kKey";
-    b.textContent=k;
+    b.type="button";
+    b.textContent=(k==="back")?"⌫":k;
     b.onclick=()=>typeKey(k);
     row.appendChild(b);
   });
@@ -200,14 +221,9 @@ function fillRow(rowId, keys){
 fillRow("1", row1);
 fillRow("2", row2);
 fillRow("3", row3.concat(["back"]));
-document.querySelectorAll(".kbdBottom .kKey").forEach(b=>{
-  b.onclick=()=>typeKey(b.dataset.key);
-});
+document.querySelectorAll(".kbdBottom .kKey").forEach(b=>b.onclick=()=>typeKey(b.dataset.key));
 
-// HOME search opens drawer for now (acts like global surface)
-$("homeSearch").onclick=()=>toast("Search Everything (mock)");
-
-// Gestures: home up=drawer; home left=connect; home down=music (demo); drawer down=home
+// Gestures with safer routing
 let sx=0, sy=0, t0=0;
 document.addEventListener("touchstart",(e)=>{
   const p=e.touches[0]; sx=p.clientX; sy=p.clientY; t0=performance.now();
@@ -216,21 +232,45 @@ document.addEventListener("touchend",(e)=>{
   const p=e.changedTouches[0];
   const dx=p.clientX-sx, dy=p.clientY-sy, dt=performance.now()-t0;
   if(Math.max(Math.abs(dx),Math.abs(dy))<40 || dt>650) return;
-  const dir = (Math.abs(dx)>Math.abs(dy)) ? (dx>0?"right":"left") : (dy>0?"down":"up");
+  const dir=(Math.abs(dx)>Math.abs(dy))?(dx>0?"right":"left"):(dy>0?"down":"up");
+
+  // music overlays close with down swipe
+  if(state.surface==="music"){
+    if(!$("musicSearch").classList.contains("hidden") && dir==="down"){ closeMusicSearch(); return; }
+    if(!$("player").classList.contains("hidden") && dir==="down"){ closePlayer(); return; }
+  }
+
   if(state.surface==="home"){
     if(dir==="up") show("drawer");
     if(dir==="left") show("connect");
-    if(dir==="down") show("music"); // quick access for demo
-  }else if(state.surface==="drawer"){
+    if(dir==="down") show("music"); // demo shortcut
+  } else if(state.surface==="drawer"){
     if(dir==="down") show("home");
-  }else if(state.surface==="connect"){
+  } else if(state.surface==="connect"){
     if(dir==="right") show("home");
-  }else if(state.surface==="music"){
-    if(!$("musicSearch").classList.contains("hidden") && dir==="down"){ closeMusicSearch(); return; }
-    if(!$("player").classList.contains("hidden") && dir==="down"){ closePlayer(); return; }
+  } else if(state.surface==="music"){
     if(dir==="right") show("home");
   }
 },{passive:true});
 
+// hash routing (prevents “no changes” confusion when refreshing)
+function routeFromHash(){
+  const h=(location.hash||"").replace("#","").trim();
+  if(screens.includes(h)) show(h);
+}
+window.addEventListener("hashchange", routeFromHash);
+
+// PWA SW
+if("serviceWorker" in navigator){
+  window.addEventListener("load", async ()=>{
+    try{
+      const reg = await navigator.serviceWorker.register("sw.js");
+      // ensure latest takes over quickly
+      if(reg.waiting) reg.waiting.postMessage({type:"SKIP_WAITING"});
+    }catch(e){}
+  });
+}
+
 show("home");
 setPlaying(true);
+routeFromHash();
