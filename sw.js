@@ -1,4 +1,4 @@
-const CACHE="fibreos-proto-v24";
+const CACHE="fibreos-proto-v25";
 const ASSETS=["./","./index.html","./styles.css","./app.js","./manifest.json","./icon-192.png","./icon-512.png"];
 self.addEventListener("install",e=>{
   self.skipWaiting();

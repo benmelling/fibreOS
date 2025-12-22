@@ -258,3 +258,52 @@ html,body{overflow:hidden;overscroll-behavior-y:none}
 .sysApp .icWrap{width:72px;height:88px;border-radius:28px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center}
 .sysApp .label{font-size:12px;font-weight:800;color:rgba(255,255,255,.90)}
 .sysClose{width:100%;margin-top:14px;height:54px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);font-weight:950}
+
+.homeQuick{
+  position:absolute;
+  right:18px;
+  top:calc(38px + var(--safe-t));
+  display:flex;
+  gap:10px;
+  z-index:55;
+}
+.lockActions{
+  position:absolute;
+  right:18px;
+  top:calc(38px + var(--safe-t));
+  display:flex;
+  gap:10px;
+  z-index:55;
+}
+.miniBtn{
+  width:54px;height:54px;border-radius:18px;
+  background:rgba(0,0,0,.40);
+  border:1px solid rgba(255,255,255,.12);
+  display:grid;place-items:center;
+  font-size:22px;
+  box-shadow:0 14px 32px rgba(0,0,0,.35);
+}
+.pinWrap{
+  position:absolute;
+  left:18px; right:18px;
+  bottom:calc(130px + var(--safe-b));
+  border-radius:34px;
+  background:rgba(0,0,0,.45);
+  border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(16px);
+  padding:18px;
+  z-index:55;
+}
+.pinTitle{font-weight:950;font-size:20px;text-align:center}
+.pinDots{display:flex;justify-content:center;gap:10px;margin:14px 0 16px}
+.dot{width:12px;height:12px;border-radius:999px;background:rgba(255,255,255,.18)}
+.dot.filled{background:rgba(255,255,255,.88)}
+.pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pinKey{
+  height:62px;border-radius:20px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  display:grid;place-items:center;
+  font-size:22px;font-weight:900;
+}
+.pinMsg{margin-top:12px;text-align:center;color:rgba(255,255,255,.70);font-weight:700;min-height:20px}

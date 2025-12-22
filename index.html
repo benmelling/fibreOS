@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <meta name="theme-color" content="#0b0b0f"/>
-  <title>FibreOS Prototype v2.4</title>
+  <title>FibreOS Prototype v2.5</title>
   <link rel="manifest" href="manifest.json"/>
   <link rel="stylesheet" href="styles.css"/>
 </head>
@@ -49,8 +49,20 @@
       </div>
     </div>
 
-    <div class="lockPills">
-      <div class="pillHint">Swipe up to unlock</div>
+    <!-- Lock actions -->
+    <div class="lockActions">
+      <button class="miniBtn" id="lockNotifs" aria-label="Notifications">🔔</button>
+      <button class="miniBtn" id="lockQS" aria-label="Quick settings">⚙️</button>
+    </div>
+
+    <!-- PIN -->
+    <div class="pinWrap" id="pinWrap">
+      <div class="pinTitle">Enter PIN</div>
+      <div class="pinDots" id="pinDots">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <div class="pinPad" id="pinPad"></div>
+      <div class="pinMsg" id="pinMsg"></div>
     </div>
 
     <div class="cornerZone left" aria-label="Notifications corner"></div>
@@ -67,6 +79,13 @@
       <div class="sysL"><span data-sys-time>00:00</span></div>
       <div class="sysR"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div>
     </header>
+
+    <!-- Home quick icons -->
+    <div class="homeQuick">
+      <button class="miniBtn" id="homeLock" aria-label="Lock">🔒</button>
+      <button class="miniBtn" id="homeNotifs" aria-label="Notifications">🔔</button>
+      <button class="miniBtn" id="homeQS" aria-label="Quick settings">⚙️</button>
+    </div>
 
     <div class="hud">
       <div class="clockBig">
@@ -85,7 +104,7 @@
     </div>
 
     <div class="homeWidgets">
-      <div class="wTile media">
+      <div class="wTile media" id="homeMediaTile">
         <div class="thumb"></div>
         <div class="wText">
           <div class="wTitle" data-media-title>Christmas</div>
@@ -143,7 +162,7 @@
 
     <div class="panelHead">
       <div class="title">Widget Hub</div>
-      <div class="sub">Swipe right to return • Tap to add</div>
+      <div class="sub">Swipe left to return • Tap to add</div>
     </div>
     <div class="list scroll" id="widgetList"></div>
     <div class="homeIndicator"></div>
@@ -158,7 +177,7 @@
 
     <div class="panelHead">
       <div class="title">Connect Hub</div>
-      <div class="sub">Unified inbox • Tap a block title for full view</div>
+      <div class="sub">Unified inbox • Swipe right to return</div>
     </div>
     <div class="list scroll" id="connectList"></div>
     <div class="homeIndicator"></div>
@@ -173,7 +192,7 @@
 
     <div class="panelHead">
       <div class="title">Overview</div>
-      <div class="sub">Swipe up to return • Swipe left/right for Spaces</div>
+      <div class="sub">Swipe up to close • Swipe left/right for Spaces</div>
     </div>
     <div class="spaces" id="spacesStrip"></div>
     <div class="cards scroll" id="recentCards"></div>
@@ -306,7 +325,7 @@
     <div class="shadeFoot">Swipe down to close</div>
   </aside>
 
-  <!-- SYSTEM MENU (bottom sheet like your screenshot) -->
+  <!-- SYSTEM MENU -->
   <aside id="sysMenu" class="sysMenu hidden" aria-hidden="true">
     <div class="sysMenuCard">
       <div class="sysMenuTitle">System</div>

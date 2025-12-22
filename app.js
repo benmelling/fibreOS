@@ -526,7 +526,6 @@ function openSystemMenu(){
   });
 }
 function makeEmojiAppGlyph(glyph, seed){
-  // return a simple colored icon block with glyph
   const colors=[
     ["#ff4aa0","#ff5f00"],
     ["#1aa3d6","#106bff"],
@@ -535,16 +534,108 @@ function makeEmojiAppGlyph(glyph, seed){
     ["#9b9b9b","#585858"],
   ];
   const p=colors[seed%colors.length];
-  return `<div class="iconSkew" style="width:44px;height:44px;border-radius:16px;display:grid;place-items:center;${`background:linear-gradient(180deg, ${p[0]}, ${p[1]});`}">${glyph}</div>`;
+  return `<div class="iconSkew" style="width:44px;height:44px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(180deg, ${p[0]}, ${p[1]});">${glyph}</div>`;
 }
 function closeSystemMenu(){ $("sysMenu").classList.add("hidden"); }
 $("sysClose").onclick=closeSystemMenu;
 $("sysMenu").addEventListener("click",(e)=>{ if(e.target.id==="sysMenu") closeSystemMenu(); });
 
+
+// Lock / AOD / PIN
+const DEFAULT_PIN = "1234";
+let pinEntry = "";
+
+function updatePinDots(){
+  const dots = document.querySelectorAll("#pinDots .dot");
+  dots.forEach((d,i)=>d.classList.toggle("filled", i < pinEntry.length));
+}
+function setPinMsg(msg){
+  const m = $("pinMsg");
+  if(m) m.textContent = msg || "";
+}
+function resetPin(){
+  pinEntry = "";
+  updatePinDots();
+  setPinMsg("");
+}
+function lockToAOD(){
+  closeShades();
+  closeSystemMenu();
+  closePlayer();
+  closeMusicSearch();
+  resetPin();
+  setScreen("aod");
+}
+function aodToLock(){
+  resetPin();
+  setScreen("lock");
+}
+function unlockHome(){
+  resetPin();
+  setScreen("home");
+}
+function renderPinPad(){
+  const pad = $("pinPad");
+  pad.innerHTML = "";
+  const keys = ["1","2","3","4","5","6","7","8","9","⌫","0","OK"];
+  keys.forEach(k=>{
+    const b=document.createElement("button");
+    b.className="pinKey";
+    b.type="button";
+    b.textContent = k;
+    b.onclick=()=>{
+      if(k==="⌫"){
+        pinEntry = pinEntry.slice(0,-1);
+        updatePinDots();
+        return;
+      }
+      if(k==="OK"){
+        if(pinEntry === DEFAULT_PIN){
+          setPinMsg("Unlocked");
+          setTimeout(()=>unlockHome(), 150);
+        }else{
+          setPinMsg("Wrong PIN");
+          pinEntry = "";
+          updatePinDots();
+        }
+        return;
+      }
+      if(pinEntry.length>=4) return;
+      pinEntry += k;
+      updatePinDots();
+      if(pinEntry.length===4){
+        // auto-check
+        if(pinEntry === DEFAULT_PIN){
+          setPinMsg("Unlocked");
+          setTimeout(()=>unlockHome(), 150);
+        }else{
+          setPinMsg("Wrong PIN");
+          setTimeout(()=>{ pinEntry=""; updatePinDots(); setPinMsg(""); }, 500);
+        }
+      }
+    };
+    pad.appendChild(b);
+  });
+}
+renderPinPad();
+
+// Home quick icons
+$("homeLock").onclick = lockToAOD;
+$("homeNotifs").onclick = ()=>openNotifs();
+$("homeQS").onclick = ()=>openQS();
+
+// Lock quick icons
+$("lockNotifs").onclick = ()=>openNotifs();
+$("lockQS").onclick = ()=>openQS();
+
+// AOD tap to lock
+$("aod").addEventListener("click", aodToLock);
+
 // Buttons
 $("btnConnect").onclick=()=>setScreen("connect");
 $("btnSearch").onclick=()=>setScreen("search");
 $("homeSearch").onclick=()=>setScreen("search");
+$("homeMediaTile").onclick=()=>setScreen("music");
 
 // Weather: Huddersfield via Open-Meteo (geocode + forecast)
 async function loadWeatherHuddersfield(){
@@ -662,32 +753,40 @@ document.addEventListener("touchend",(e)=>{
     const fromBottom = sy > (window.innerHeight - 140);
     if(fromBottom && sx < 140 && dir==="up"){ openNotifs(); return; }
     if(fromBottom && sx > (window.innerWidth - 140) && dir==="up"){ openQS(); return; }
-    if(dir==="up"){ setScreen("home"); return; }
+    if(dir==="up"){ /* show PIN already visible */ return; }
     if(dir==="down"){ setScreen("aod"); return; }
     return;
   }
 
-  // Main nav gestures (from your map)
+  // Main nav gestures (as specified)
   if(state.screen==="home"){
+    // App drawer: bottom->top open
     if(dir==="up") setScreen("drawer");
+    // Multitasking: top->bottom open
     if(dir==="down") setScreen("overview");
-    if(dir==="left") setScreen("connect");
+    // Widgets: left->right open
     if(dir==="right") setScreen("widgets");
+    // Connect: right->left open
+    if(dir==="left") setScreen("connect");
     return;
   }
   if(state.screen==="drawer"){
+    // top->bottom close
     if(dir==="down") setScreen("home");
     return;
   }
   if(state.screen==="widgets"){
-    if(dir==="right") setScreen("home");
-    return;
-  }
-  if(state.screen==="connect"){
+    // right->left close
     if(dir==="left") setScreen("home");
     return;
   }
+  if(state.screen==="connect"){
+    // left->right close
+    if(dir==="right") setScreen("home");
+    return;
+  }
   if(state.screen==="overview"){
+    // bottom->top close
     if(dir==="up") setScreen("home");
     if(dir==="left"){ state.spaceIndex=(state.spaceIndex+1)%state.spaces.length; renderOverview(); }
     if(dir==="right"){ state.spaceIndex=(state.spaceIndex-1+state.spaces.length)%state.spaces.length; renderOverview(); }
@@ -703,8 +802,6 @@ document.addEventListener("touchend",(e)=>{
   }
 },{passive:true});
 
-// Tap to wake on AOD
-$("aod").addEventListener("click", ()=>setScreen("lock"));
 
 // Prevent pull-to-refresh on Android Chrome by blocking downward drag at top
 let ptrY = null;
