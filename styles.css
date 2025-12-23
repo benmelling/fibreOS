@@ -3,7 +3,7 @@
   --fg:#f7f7fb;
   --safe-t: env(safe-area-inset-top);
   --safe-b: env(safe-area-inset-bottom);
-  --capsule-h: clamp(172px, 22vh, 212px);
+  --capsule-h: 146px;
   --radius: 46px;
   --pad: 18px;
   --shadow: 0 26px 80px rgba(0,0,0,.70);
@@ -25,6 +25,7 @@ button{border:0;background:none;color:inherit}
 
 /* Content above capsule */
 .content{
+  overflow-x:hidden;
   position:absolute; inset:0;
   padding:calc(var(--safe-t) + 22px) var(--pad) calc(var(--capsule-h) + var(--safe-b) + 16px);
   overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
@@ -127,7 +128,7 @@ button{border:0;background:none;color:inherit}
 .lockLayout{position:relative;height:100%;padding:calc(var(--safe-t) + 22px) var(--pad) calc(var(--capsule-h) + var(--safe-b) + 16px)}
 .pinWrap{
   position:absolute;left:var(--pad);right:var(--pad);
-  bottom:calc(var(--capsule-h) + var(--safe-b) + 26px);
+  top:50%;transform:translateY(-50%);
   border-radius:34px;background:rgba(0,0,0,.45);
   border:1px solid rgba(255,255,255,.12);
   backdrop-filter:blur(16px);padding:18px
@@ -151,8 +152,7 @@ button{border:0;background:none;color:inherit}
   padding:16px 16px 14px;
   background:rgba(0,0,0,.40);
   border:1px solid rgba(255,255,255,.10);
-  backdrop-filter:blur(20px);
-  box-shadow:var(--shadow);
+    box-shadow:var(--shadow);
   z-index:100;
   display:flex;flex-direction:column;justify-content:space-between;gap:12px;
 }
@@ -189,8 +189,7 @@ button{border:0;background:none;color:inherit}
 /* Menu sheet */
 .menuSheet{
   position:absolute;left:16px;right:16px;top:92px;height:80px;border-radius:28px;
-  background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(18px);
-  display:flex;gap:14px;align-items:center;padding:12px;
+  background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.12);  display:flex;gap:14px;align-items:center;padding:12px;
 }
 .appIcon{
   flex:1;height:100%;border-radius:22px;background:rgba(255,255,255,.08);
@@ -219,8 +218,7 @@ button{border:0;background:none;color:inherit}
   border-radius:42px;
   background:rgba(0,0,0,.44);
   border:1px solid rgba(255,255,255,.12);
-  backdrop-filter:blur(20px);
-  box-shadow:0 30px 90px rgba(0,0,0,.65);
+    box-shadow:0 30px 90px rgba(0,0,0,.65);
   padding:18px 18px 16px;
   display:flex; flex-direction:column; gap:10px;
 }
@@ -269,3 +267,236 @@ button{border:0;background:none;color:inherit}
 .homeBar::after{
   content:""; position:absolute; inset:-18px -22px; border-radius:999px;
 }
+
+
+/* Capsule middle (Now Playing slot) */
+.capMiddle{
+  display:flex;align-items:center;gap:12px;
+  border-radius:28px;
+  padding:10px 12px;
+  background:rgba(0,0,0,.32);
+  border:1px solid rgba(255,255,255,.10);
+}
+.capMiddle .npArt{width:46px;height:46px;border-radius:16px}
+.capMiddle .npTitle{font-size:16px;font-weight:950;line-height:1.05}
+.capMiddle .npArtist{font-size:13px;opacity:.65;font-weight:750}
+.capMiddle .npBtns .npBtn{width:40px;height:40px;border-radius:16px}
+.capMiddle .npBtns{margin-left:auto}
+
+/* Capsule search input */
+.capSearchInput{
+  flex:1;
+  height:100%;
+  border:0;
+  outline:none;
+  background:transparent;
+  color:rgba(255,255,255,.92);
+  font-size:20px;
+  font-weight:850;
+  letter-spacing:-.01em;
+}
+.capSearchInput::placeholder{color:rgba(255,255,255,.70)}
+
+/* Home dock apps (temporary) */
+.homeDock{
+  margin-top:22px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+.dockApp{
+  flex:1;
+  height:88px;
+  border-radius:30px;
+  background:rgba(0,0,0,.34);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 18px 44px rgba(0,0,0,.45);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+}
+.dockApp .dIco{font-size:28px}
+.dockApp .dLbl{font-size:12px;font-weight:950;opacity:.85}
+
+/* Browser mock */
+.browserFrame{
+  margin-top:18px;
+  border-radius:34px;
+  min-height:420px;
+  background:rgba(0,0,0,.30);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 18px 44px rgba(0,0,0,.45);
+  overflow:hidden;
+  position:relative;
+}
+.browserBlocked{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px; text-align:center;
+}
+.bbTitle{font-size:24px;font-weight:950;letter-spacing:-.02em}
+.bbText{margin-top:10px;font-size:14px;font-weight:700;opacity:.70;max-width:320px}
+.bbBtn{
+  margin-top:16px;
+  height:48px;
+  padding:0 18px;
+  border-radius:999px;
+  background:rgba(72,245,210,.92);
+  color:#051015;
+  font-weight:950;
+  border:1px solid rgba(255,255,255,.10);
+}
+
+:root{ --capsule-h-expanded: 212px; }
+
+/* Solid surfaces (no translucency) */
+.capsule{
+  background:#0b0b10 !important;
+}
+.tile, .tileInner.dark, .nowPlaying, .pinWrap, .menuSheet, .browserFrame, .solidCard, .chatComposer{
+  background:#0b0b10;
+}
+.tile{border-color:rgba(255,255,255,.10)}
+.pinWrap{border-color:rgba(255,255,255,.12)}
+.menuSheet{background:#0b0b10}
+.capSearch{background:#5e0f43} /* keep magenta */
+.capMenu{background:#48f5d2}
+
+/* Pager */
+.homePager{
+  display:flex;
+  width:300%;
+  transform:translateX(-100%);
+  transition:transform .22s ease;
+}
+.homePage{
+  width:100%;
+  padding:0;
+}
+.pageHeader{margin-top:8px}
+.pageTitle{font-size:44px;font-weight:950;letter-spacing:-.03em}
+.pageSub{margin-top:8px;font-size:14px;font-weight:800;opacity:.65}
+.pageBody{margin-top:18px;display:flex;flex-direction:column;gap:14px}
+.solidCard{
+  border-radius:34px;
+  border:1px solid rgba(255,255,255,.10);
+  padding:18px;
+  box-shadow:0 18px 44px rgba(0,0,0,.45);
+}
+.cardTitle{font-size:20px;font-weight:950}
+.cardSub{margin-top:6px;font-size:14px;font-weight:750;opacity:.75}
+
+/* Connect rows */
+.chatRow{
+  border-radius:34px;
+  border:1px solid rgba(255,255,255,.10);
+  padding:14px;
+  background:#0b0b10;
+  display:flex;align-items:center;gap:12px;
+  text-align:left;
+}
+.avatar{
+  width:44px;height:44px;border-radius:16px;
+  background:#20202a;
+  display:grid;place-items:center;
+  font-weight:950;
+}
+.chatMeta{flex:1}
+.chatName{font-weight:950}
+.chatSnippet{margin-top:4px;opacity:.65;font-weight:750}
+.chatBadge{
+  min-width:28px;height:28px;border-radius:999px;
+  background:#a51634;color:#fff;
+  display:grid;place-items:center;
+  font-weight:950;font-size:12px;
+}
+
+/* Chat screen */
+.chatThread{
+  margin-top:18px;
+  display:flex;flex-direction:column;gap:10px;
+  padding-bottom:120px;
+}
+.bubble{
+  max-width:78%;
+  border-radius:26px;
+  padding:12px 14px;
+  border:1px solid rgba(255,255,255,.10);
+  font-weight:750;
+}
+.bubble.them{background:#14141b; align-self:flex-start}
+.bubble.me{background:#5e0f43; align-self:flex-end}
+.chatComposer{
+  position:fixed;
+  left:6px; right:6px;
+  bottom:calc(6px + var(--capsule-h) + var(--safe-b));
+  height:66px;
+  border-radius:38px;
+  border:1px solid rgba(255,255,255,.10);
+  display:flex;gap:10px;align-items:center;
+  padding:10px 12px;
+}
+.chatInput{
+  flex:1;height:46px;border-radius:24px;
+  border:1px solid rgba(255,255,255,.10);
+  background:#0b0b10;color:rgba(255,255,255,.92);
+  padding:0 14px;
+}
+.chatSend{
+  height:46px;border-radius:999px;
+  padding:0 16px;
+  background:#48f5d2;color:#051015;
+  font-weight:950;
+}
+
+/* Sheets (Notifications/Controls) */
+.sheet{
+  position:fixed; left:0; right:0;
+  top:0; bottom:0;
+  z-index:95;
+  background:#000;
+}
+.sheetHead{
+  padding:calc(var(--safe-t) + 16px) 18px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sheetTitle{font-size:28px;font-weight:950}
+.sheetClose{height:42px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:#0b0b10;font-weight:950}
+.sheetBody{padding:12px 18px;display:flex;flex-direction:column;gap:12px}
+.sheetCard{
+  border-radius:34px;border:1px solid rgba(255,255,255,.10);
+  padding:16px;background:#0b0b10;
+}
+.redacted{opacity:.55}
+.redacted::after{content:" • Unlock to view"; opacity:.7}
+
+/* Capsule height animation */
+.capsule{ transition:height .18s ease; }
+.capsule.is-expanded{ height:var(--capsule-h-expanded); }
+.capStatusBtn,.capTimeBtn{display:flex;align-items:flex-end;gap:0; background:transparent; padding:0; border:0; color:inherit}
+.capStatusBtn{justify-self:end}
+
+/* Battery colour states */
+.batIcon{ position:relative; width:34px; height:18px; border-radius:999px; border:2px solid rgba(255,255,255,.85); padding:2px; display:inline-flex; align-items:center; }
+.batIcon::after{ content:""; position:absolute; right:-5px; top:5px; width:4px; height:8px; border-radius:3px; background:rgba(255,255,255,.85); }
+.batFill{ height:100%; width:50%; border-radius:999px; background:#e6e6e6; transition:width .25s ease, background .25s ease; }
+.battery.is-charging .batFill{ background:#2ee66a; }
+.battery.is-lowpower .batFill{ background:#ffd23b; }
+.battery.is-critical .batFill{ background:#ff3b30; }
+
+/* Signal indicators (rounded bars) */
+.sig{ display:inline-flex; align-items:flex-end; gap:3px; height:18px; }
+.sig i{ display:block; width:4px; border-radius:999px; background:rgba(255,255,255,.28); }
+.sig-cell i:nth-child(1){height:6px}
+.sig-cell i:nth-child(2){height:9px}
+.sig-cell i:nth-child(3){height:12px}
+.sig-cell i:nth-child(4){height:15px}
+.sig-wifi i:nth-child(1){height:6px}
+.sig-wifi i:nth-child(2){height:10px}
+.sig-wifi i:nth-child(3){height:14px}
+.sig[data-level="0"] i{background:rgba(255,255,255,.18)}
+.sig[data-level="1"] i:nth-child(1){background:rgba(255,255,255,.85)}
+.sig[data-level="2"] i:nth-child(-n+2){background:rgba(255,255,255,.85)}
+.sig[data-level="3"] i:nth-child(-n+3){background:rgba(255,255,255,.85)}
+.sig-cell[data-level="4"] i{background:rgba(255,255,255,.85)}
+
+/* Pager easing while dragging */
+.homePager{ will-change:transform; }

@@ -4,9 +4,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <meta name="theme-color" content="#0a0a10"/>
-  <title>FibreOS Clean v2.9.3</title>
+  <title>FibreOS Clean v2.9.6</title>
   <link rel="manifest" href="manifest.json"/>
-  <link rel="stylesheet" href="styles.css?v=293"/>
+  <link rel="stylesheet" href="styles.css?v=296"/>
 </head>
 <body>
 <div id="app" class="app">
@@ -15,38 +15,105 @@
   <main id="content" class="content">
     <!-- HOME -->
     <section id="home" class="screen is-active" aria-label="Home">
-      <div class="hero">
-        <div class="heroClock">
-          <div class="hh" data-hh>00</div>
-          <div class="mm" data-mm>00</div>
-        </div>
-        <div class="heroMeta">
-          <div class="day" data-day>Monday</div>
-          <div class="monthRow"><span class="month" data-month>December</span> <span class="date" data-date>22</span></div>
-          <div class="weatherRow">
-            <div class="tempNow"><span data-now>7</span>°</div>
-            <div class="descBlock">
-              <div class="desc" data-desc>Overcast</div>
-              <div class="range"><span data-hi>9</span>° • <span data-lo>7</span>°</div>
+      <div id="homePager" class="homePager">
+        <!-- Widgets page (left) -->
+        <div class="homePage" data-page="widgets">
+          <div class="pageHeader">
+            <div class="pageTitle">Widgets</div>
+            <div class="pageSub">Swipe to go Home</div>
+          </div>
+          <div class="pageBody">
+            <div class="solidCard">
+              <div class="cardTitle">Weather widget</div>
+              <div class="cardSub">Huddersfield • <span data-desc>Overcast</span> • <span data-now>7</span>°</div>
+            </div>
+            <div class="solidCard">
+              <div class="cardTitle">Calendar widget</div>
+              <div class="cardSub">Tomorrow 09:00 • DPD Delivery</div>
+            </div>
+            <div class="solidCard">
+              <div class="cardTitle">Now Playing</div>
+              <div class="cardSub">Last Christmas • Wham!</div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="homeGrid">
-        <div class="tile big">
-          <div class="tileInner dark">
-            <div class="tileTitle">Christmas<br/>Market Fun</div>
-            <div class="tileSub">▶ 2025</div>
+        <!-- Main Home (center) -->
+        <div class="homePage is-home" data-page="home">
+          <div class="hero">
+            <div class="heroClock">
+              <div class="hh" data-hh>00</div>
+              <div class="mm" data-mm>00</div>
+            </div>
+            <div class="heroMeta">
+              <div class="day" data-day>Monday</div>
+              <div class="monthRow"><span class="month" data-month>December</span> <span class="date" data-date>22</span></div>
+              <div class="weatherRow">
+                <div class="tempNow"><span data-now>7</span>°</div>
+                <div class="descBlock">
+                  <div class="desc" data-desc>Overcast</div>
+                  <div class="range"><span data-hi>9</span>° • <span data-lo>7</span>°</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="homeGrid">
+            <div class="tile big">
+              <div class="tileInner dark">
+                <div class="tileTitle">Christmas<br/>Market Fun</div>
+                <div class="tileSub">▶ 2025</div>
+              </div>
+            </div>
+
+            <div class="tile big grad"></div>
+
+            <div class="tile wide agenda">
+              <div class="agendaHead" data-agenda>Monday 22nd December</div>
+              <div class="agendaBody" id="agendaList"></div>
+              <button class="agendaAdd" title="Add">+</button>
+            </div>
+          </div>
+
+          <div class="homeDock">
+            <button class="dockApp" data-go="music" aria-label="Music"><span class="dIco">🎵</span><span class="dLbl">Music</span></button>
+            <button class="dockApp" data-go="browser" aria-label="Browser"><span class="dIco">🌐</span><span class="dLbl">Browser</span></button>
+            <button class="dockApp" data-go="lock" aria-label="Lock"><span class="dIco">🔒</span><span class="dLbl">Lock</span></button>
           </div>
         </div>
 
-        <div class="tile big grad"></div>
-
-        <div class="tile wide agenda">
-          <div class="agendaHead" data-agenda>Monday 22nd December</div>
-          <div class="agendaBody" id="agendaList"></div>
-          <button class="agendaAdd" title="Add">+</button>
+        <!-- Connect page (right) -->
+        <div class="homePage" data-page="connect">
+          <div class="pageHeader">
+            <div class="pageTitle">Connect Hub</div>
+            <div class="pageSub">Unified inbox • tap to open chat</div>
+          </div>
+          <div class="pageBody">
+            <button class="chatRow" data-chat="lia">
+              <div class="avatar">L</div>
+              <div class="chatMeta">
+                <div class="chatName">Lia · WhatsApp</div>
+                <div class="chatSnippet">Do you want anything from the shop?</div>
+              </div>
+              <div class="chatBadge">2</div>
+            </button>
+            <button class="chatRow" data-chat="mum">
+              <div class="avatar">M</div>
+              <div class="chatMeta">
+                <div class="chatName">Mum · RCS</div>
+                <div class="chatSnippet">Are you free Sunday?</div>
+              </div>
+              <div class="chatBadge">1</div>
+            </button>
+            <button class="chatRow" data-chat="vp">
+              <div class="avatar">V</div>
+              <div class="chatMeta">
+                <div class="chatName">VP Trade Team · Slack</div>
+                <div class="chatSnippet">New build is on staging.</div>
+              </div>
+              <div class="chatBadge">5</div>
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -187,6 +254,26 @@
 
   </main>
 
+
+  <!-- NOTIFICATION CENTRE -->
+  <div id="notifSheet" class="sheet hidden" aria-label="Notifications">
+    <div class="sheetHead">
+      <div class="sheetTitle">Notifications</div>
+      <button class="sheetClose" data-close="notifSheet">Close</button>
+    </div>
+    <div class="sheetBody" id="notifBody"></div>
+  </div>
+
+  <!-- CONTROL CENTRE -->
+  <div id="controlSheet" class="sheet hidden" aria-label="Controls">
+    <div class="sheetHead">
+      <div class="sheetTitle">Controls</div>
+      <button class="sheetClose" data-close="controlSheet">Close</button>
+    </div>
+    <div class="sheetBody" id="controlBody"></div>
+  </div>
+
+
   <!-- FIXED FIBRE CAPSULE -->
   <footer id="capsule" class="capsule" aria-label="Fibre capsule">
     <div class="capTop">
@@ -200,11 +287,11 @@
     </div>
 
     <div class="capBottom">
-      <div class="capTime" id="capTime">00:00</div>
+      <button id="capTimeBtn" class="capTimeBtn" type="button"><div class="capTime" id="capTime">00:00</div></button>
       <div class="homeBar" aria-hidden="true"></div>
-      <div class="capStatus">
-        <span class="ico cell" title="Cell"></span>
-        <span class="ico wifi" title="Wi-Fi"></span>
+      <button id="capStatusBtn" class="capStatusBtn" type="button"><div class="capStatus">
+        <span class="sig sig-cell" title="Cell"><i></i><i></i><i></i><i></i></span>
+        <span class="sig sig-wifi" title="Wi‑Fi"><i></i><i></i><i></i></span>
         <span class="battery" title="Battery">
           <span class="batIcon"><span class="batFill" id="batFill"></span></span>
           <span class="batPct" id="batPct">--%</span>
@@ -221,6 +308,6 @@
 </div>
 
 <script>window.__COVERS__ = ["assets/cover_00.png", "assets/cover_01.png", "assets/cover_02.png", "assets/cover_03.png", "assets/cover_04.png", "assets/cover_05.png", "assets/cover_06.png", "assets/cover_07.png", "assets/cover_08.png", "assets/cover_09.png", "assets/cover_10.png", "assets/cover_11.png", "assets/cover_12.png", "assets/cover_13.png", "assets/cover_14.png", "assets/cover_15.png"];</script>
-<script src="app.js?v=293"></script>
+<script src="app.js?v=296"></script>
 </body>
 </html>
