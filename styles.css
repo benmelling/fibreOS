@@ -9,6 +9,7 @@
 
   --pad: 18px;
   --radius: 46px;
+  --ui-scale: 0.86; /* global UI size */
 
   /* Capsule baseline height (no extras) */
   --cap-h: 146px;
@@ -22,6 +23,7 @@
 *{ box-sizing:border-box; }
 html, body{ height:100%; margin:0; }
 body{
+  font-size: calc(16px * var(--ui-scale));
   background:#000;
   color:var(--fg);
   font-family:"Google Sans Flex", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
@@ -67,20 +69,20 @@ button, input{ font:inherit; border:0; background:none; color:inherit; }
 .hero{ display:flex; gap:14px; align-items:flex-start; margin-top:6px; }
 .heroClock{ flex:1; }
 .heroClock .hh, .heroClock .mm{
-  font-size: 118px;
+  font-size: 104px;
   line-height: .86;
   letter-spacing: -.06em;
 }
 .heroClock .hh{ font-weight:320; opacity:.92; }
 .heroClock .mm{ font-weight:900; opacity:.92; }
 .heroMeta{ width:170px; padding-top:18px; }
-.heroMeta .day{ font-size:40px; font-weight:520; opacity:.65; letter-spacing:-.02em; }
-.monthRow{ display:flex; justify-content:space-between; font-size:36px; font-weight:520; opacity:.75; letter-spacing:-.02em; }
+.heroMeta .day{ font-size:34px; font-weight:520; opacity:.65; letter-spacing:-.02em; }
+.monthRow{ display:flex; justify-content:space-between; font-size:32px; font-weight:520; opacity:.75; letter-spacing:-.02em; }
 .monthRow .date{ font-weight:900; opacity:.75; }
 .weatherRow{ display:flex; gap:14px; margin-top:10px; align-items:flex-end; }
-.weatherRow .temp{ font-size:44px; font-weight:900; letter-spacing:-.03em; opacity:.92; }
-.wxMain{ font-size:32px; font-weight:520; opacity:.82; letter-spacing:-.02em; }
-.wxRange{ font-size:24px; font-weight:520; opacity:.65; letter-spacing:-.01em; }
+.weatherRow .temp{ font-size:38px; font-weight:900; letter-spacing:-.03em; opacity:.92; }
+.wxMain{ font-size:28px; font-weight:520; opacity:.82; letter-spacing:-.02em; }
+.wxRange{ font-size:21px; font-weight:520; opacity:.65; letter-spacing:-.01em; }
 
 /* Home pinned row */
 .homePinned{
@@ -114,7 +116,7 @@ button, input{ font:inherit; border:0; background:none; color:inherit; }
 .homeCards{
   position:absolute;
   left:0; right:0;
-  top: 330px;
+  top: 260px;
   display:grid;
   grid-template-columns: 1fr 1fr;
   gap:16px;
@@ -127,21 +129,21 @@ button, input{ font:inherit; border:0; background:none; color:inherit; }
   overflow:hidden;
 }
 .card.big{ height:180px; padding:24px; display:flex; flex-direction:column; justify-content:flex-end; }
-.card.big .t{ font-size:44px; font-weight:950; letter-spacing:-.03em; line-height: .95; }
+.card.big .t{ font-size:38px; font-weight:950; letter-spacing:-.03em; line-height: .95; }
 .card.big .s{ margin-top:10px; font-size:26px; font-weight:700; opacity:.55; }
 .card.big.alt{ background: linear-gradient(135deg, rgba(160,0,40,.75), rgba(20,120,110,.65)); }
 .card.wide{ grid-column: 1 / span 2; height:170px; }
 .wideTop{
   background: rgba(168,46,46,.92);
   padding:16px 22px;
-  font-size:40px;
+  font-size:34px;
   font-weight:950;
   letter-spacing:-.02em;
 }
 .wideBody{ padding:18px 22px; font-size:26px; font-weight:750; opacity:.62; }
 
 /* Placeholder pages */
-.pageTitle{ margin-top: calc(var(--safe-t) + 36px); font-size:56px; font-weight:950; letter-spacing:-.03em; }
+.pageTitle{ margin-top: calc(var(--safe-t) + 36px); font-size:46px; font-weight:950; letter-spacing:-.03em; }
 .placeholder{ margin-top: 14px; font-size:22px; opacity:.65; font-weight:650; }
 
 /* Drawer (vertical sheet) */
@@ -158,6 +160,12 @@ button, input{ font:inherit; border:0; background:none; color:inherit; }
   transition: transform .32s cubic-bezier(.2,.9,.1,1);
   padding: calc(var(--safe-t) + 14px) calc(var(--pad) + var(--safe-r)) calc(var(--cap-h) + var(--safe-b) + 18px) calc(var(--pad) + var(--safe-l));
   overflow:auto;
+
+  background:
+    radial-gradient(900px 650px at 25% 20%, var(--accentA), transparent 62%),
+    radial-gradient(900px 650px at 80% 70%, var(--accentB), transparent 62%),
+    linear-gradient(180deg, var(--accentC), rgba(0,0,0,.86)),
+    #000;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
@@ -255,7 +263,7 @@ button, input{ font:inherit; border:0; background:none; color:inherit; }
   background:transparent;
   outline:none;
   border:0;
-  font-size:24px;
+  font-size:22px;
   font-weight:900;
   letter-spacing:-.02em;
   color:#f7f7fb;
@@ -269,7 +277,7 @@ button, input{ font:inherit; border:0; background:none; color:inherit; }
   padding: 0 18px 14px;
 }
 .capTime{
-  font-size:34px;
+  font-size:30px;
   font-weight:950;
   letter-spacing:-.02em;
   opacity:.92;
@@ -355,7 +363,7 @@ button, input{ font:inherit; border:0; background:none; color:inherit; }
   background: rgba(255,255,255,.92);
   opacity:.85;
 }
-.batPct{ font-size:22px; opacity:.92; }
+.batPct{ font-size:20px; opacity:.92; }
 
 /* Toast */
 .toast{
@@ -376,3 +384,41 @@ button, input{ font:inherit; border:0; background:none; color:inherit; }
   opacity:1;
   transform: translateX(-50%) translateY(-6px);
 }
+
+
+/* Home pinned icons (matches Figma position above capsule) */
+
+.home .pinnedRow{
+  position:absolute;
+  left: var(--pad);
+  right: var(--pad);
+  bottom: calc(var(--capsule-h) + var(--safe-b) + 24px);
+  display:flex;
+  justify-content:space-between;
+  gap: 18px;
+  z-index: 3;
+}
+
+.home .pinnedRow .appIcon{
+  width: 66px;
+  height: 66px;
+  border-radius: 34px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.55);
+  opacity: 1 !important;
+}
+
+.home .pinnedRow .label{
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  opacity: .95;
+  margin-top: 8px;
+}
+
+.home .pinnedRow .appBtn{
+  opacity: 1 !important;
+
+  opacity: 1;
+}
+
+.home .pinnedRow *{ opacity: 1; }

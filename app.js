@@ -1,6 +1,7 @@
 // FibreOS Nav Reset v3.0.1
 const state = {
-  pageIndex: 0,
+  // 0 = Widgets (left), 1 = Home (middle), 2 = Connect (right)
+  pageIndex: 1,
   drawerOpen: false
 };
 
@@ -14,10 +15,12 @@ function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
 function setBgForPage(i){
   // quick theme shift per page (capsule stays fixed)
   const root = document.documentElement;
-  if(i===0){
+  if(i===1){
+    // Home (middle)
     root.style.setProperty('--accentA','rgba(208,25,92,.22)');
     root.style.setProperty('--accentB','rgba(72,245,210,.15)');
-  }else if(i===1){
+  }else if(i===0){
+    // Widgets (left)
     root.style.setProperty('--accentA','rgba(72,245,210,.20)');
     root.style.setProperty('--accentB','rgba(255,210,80,.16)');
   }else{
@@ -153,7 +156,7 @@ document.getElementById('capMenuBtn').addEventListener('click', ()=>{
 const homeBar = document.getElementById('homeBar');
 homeBar.addEventListener('click', ()=>{
   closeDrawer();
-  state.pageIndex = 0;
+  state.pageIndex = 1;
   render();
 });
 
