@@ -3,13 +3,15 @@ function setBatteryUI(pct, charging){
   const fill=document.getElementById("batFill");
   const pctEl=document.getElementById("batPct");
   const batWrap=document.querySelector(".battery");
-  if(fill) fill.style.width = `${Math.max(4, Math.min(100, pct))}%`;
-  if(pctEl) pctEl.textContent = `${Math.round(pct)}%`;
+  const safePct = Math.max(0, Math.min(100, Number(pct)||0));
+  if(fill) fill.style.width = `${Math.max(4, safePct)}%`;
+  if(pctEl) pctEl.textContent = `${Math.round(safePct)}%`;
   if(batWrap){
     batWrap.classList.toggle("is-charging", !!charging);
-    batWrap.classList.toggle("is-lowpower", !!lowPowerMode && !charging && pct>=10);
-    batWrap.classList.toggle("is-critical", !charging && pct<10);
+    batWrap.classList.toggle("is-lowpower", !!lowPowerMode && !charging && safePct>=10);
+    batWrap.classList.toggle("is-critical", !charging && safePct<10);
   }
+}
 }
 
 async function initBattery(){
@@ -70,6 +72,22 @@ function initSignals(){
   }, 4000);
 }
 
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+function updateClockAll(){
+  const d=new Date();
+  const hh=pad2(d.getHours());
+  const mm=pad2(d.getMinutes());
+  // Home/AOD/Lock big clock (home uses data-hh/data-mm)
+  document.querySelectorAll('[data-hh]').forEach(el=>el.textContent=hh);
+  document.querySelectorAll('[data-mm]').forEach(el=>el.textContent=mm);
+  // Capsule time
+  const cap=document.getElementById('capTime');
+  if(cap) cap.textContent = `${hh}:${mm}`;
+}
+updateClockAll();
+setInterval(updateClockAll, 1000);
+
 // v2.9.2: disable service worker to avoid caching glitches while iterating
 (async ()=>{
   try{
@@ -96,9 +114,9 @@ function updateCapsuleSize(){
 
 const $=(q,el=document)=>el.querySelector(q);
 const $$=(q,el=document)=>Array.from(el.querySelectorAll(q));
-const SCREENS=["home","music","browser","chat","lock","aod"];
+const SCREENS=["home","music","browser","chat"];
 let active="home";
-let isUnlocked=false;
+let isUnlocked=true;
 let lowPowerMode=false;
 
 function show(screen){
@@ -244,7 +262,8 @@ function checkPin(){
   if(DEFAULT_PINS.includes(pinEntry)){
     setPinMsg("Unlocked");
     isUnlocked=true;
-    setTimeout(()=>{ resetPin(); show("home"); }, 140);
+    setTimeout(()=>{ resetPin(); show("home");
+}, 140);
   }else{
     setPinMsg("Wrong PIN");
     setTimeout(()=>{ resetPin(); }, 420);
@@ -399,7 +418,7 @@ document.querySelectorAll('.dockApp').forEach(b=>{
   b.addEventListener('click', ()=>{
     const go=b.getAttribute('data-go');
     closePanels();
-    if(go==='lock'){ isUnlocked=false; resetPin(); show('aod'); return; }
+    
     show(go);
   });
 });
@@ -408,7 +427,7 @@ document.querySelectorAll('.drawerApp').forEach(b=>{
   b.addEventListener('click', ()=>{
     const go=b.getAttribute('data-go');
     closePanels();
-    if(go==='lock'){ isUnlocked=false; resetPin(); show('aod'); return; }
+    
     show(go);
   });
 });
@@ -556,81 +575,123 @@ contentEl.addEventListener('touchend',(e)=>{
 },{passive:true});
 
 show("home");
-
-
 const oc=document.getElementById('openChatGPT'); if(oc){ oc.addEventListener('click', ()=>{ window.open('https://chat.openai.com', '_blank'); }); }
 
 
 document.querySelector('.capSearch').addEventListener('click', ()=>{ const i=document.getElementById('capSearchInput'); if(i) i.focus(); });
 
-// AOD -> Lock
-document.getElementById('aod').addEventListener('click', ()=>{
-  show('lock');
-});
 
-function buildPinPad(){
-  const pad=document.getElementById('pinPad');
-  if(!pad) return;
-  const keys=["1","2","3","4","5","6","7","8","9","⌫","0","OK"];
-  pad.innerHTML = keys.map(k=>`<button class="pinKey" data-k="${k}">${k}</button>`).join("");
-  pad.querySelectorAll('button').forEach(b=>{
+
+
+
+// --- App Drawer (v3.0.0) ---
+let drawerOpen=false;
+const APP_LIST = [["Music", "\ud83c\udfb5", "music"], ["Home", "\ud83c\udfe0", "home"], ["Photos", "\ud83d\uddbc\ufe0f", "photos"], ["Camera", "\ud83d\udcf7", "camera"], ["Settings", "\u2699\ufe0f", "settings"], ["News", "\ud83d\udcf0", "news"], ["Brave", "\ud83e\udded", "brave"], ["Mail", "\u2709\ufe0f", "mail"], ["Wallet", "\ud83d\udc5b", "wallet"], ["Toolbox", "\ud83e\uddf0", "toolbox"], ["Connect", "\ud83d\udcac", "connect"], ["Widgets", "\ud83e\udde9", "widgets"], ["Browser", "\ud83c\udf10", "browser"], ["Chat", "\ud83e\udd16", "chat"], ["App 15", "\u2b21", "app15"], ["App 16", "\u2b21", "app16"], ["App 17", "\u2b21", "app17"], ["App 18", "\u2b21", "app18"], ["App 19", "\u2b21", "app19"], ["App 20", "\u2b21", "app20"], ["App 21", "\u2b21", "app21"], ["App 22", "\u2b21", "app22"], ["App 23", "\u2b21", "app23"], ["App 24", "\u2b21", "app24"]];
+
+function renderDrawer(){
+  const grid=document.getElementById('drawerGrid');
+  if(!grid) return;
+  grid.innerHTML = APP_LIST.map(([name, glyph, id])=>`
+    <button class="drawerApp" data-app="${id}">
+      <span class="icon">${glyph}</span>
+      <span class="lbl">${name}</span>
+    </button>`).join('');
+  grid.querySelectorAll('button').forEach(b=>{
     b.addEventListener('click', ()=>{
-      const k=b.getAttribute('data-k');
-      if(k==="⌫"){ pinEntry=pinEntry.slice(0,-1); updateDots(); return; }
-      if(k==="OK"){ checkPin(); return; }
-      if(pinEntry.length<4){ pinEntry+=k; updateDots(); if(pinEntry.length===4) checkPin(); }
+      const id=b.getAttribute('data-app');
+      if(id==='music') show('music');
+      else if(id==='browser') show('browser');
+      else if(id==='chat') show('chat');
+      else if(id==='widgets') { if(active==='home') setPager(0,true); }
+      else if(id==='connect') { if(active==='home') setPager(2,true); }
+      closeDrawer();
     });
   });
 }
-function updateDots(){
-  const dots=document.querySelectorAll('#pinDots span');
-  dots.forEach((d,i)=>d.classList.toggle('filled', i < pinEntry.length));
+
+function openDrawer(){
+  if(drawerOpen || active!=='home') return;
+  drawerOpen=true;
+  document.body.classList.add('drawer-open');
+  const sc=document.getElementById('drawerScroll');
+  if(sc) sc.scrollTop=0;
 }
-function showPinOverlay(showIt){
-  const ov=document.getElementById('pinOverlay');
-  const top=document.getElementById('lockTop');
-  if(!ov || !top) return;
-  ov.classList.toggle('hidden', !showIt);
-  top.classList.toggle('is-blurred', showIt);
-  if(showIt) buildPinPad();
-}
-document.getElementById('lockClockTap').addEventListener('click', ()=>showPinOverlay(true));
-
-
-
-function isStandalone(){
-  return (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches)
-      || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
-      || (navigator.standalone === true);
+function closeDrawer(){
+  if(!drawerOpen) return;
+  drawerOpen=false;
+  document.body.classList.remove('drawer-open');
 }
 
-async function enterFullscreen(){
-  const el=document.documentElement;
-  try{
-    if(el.requestFullscreen) await el.requestFullscreen();
-    else if(el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
-  }catch(e){}
-}
+renderDrawer();
 
-function setupFullscreen(){
-  const hint=document.getElementById('fsHint');
-  const btn=document.getElementById('fsBtn');
-  if(!hint || !btn) return;
-  if(isStandalone()){
-    hint.classList.remove('is-show');
-    return;
-  }
-  // Show hint in browser mode; user can dismiss by entering fullscreen.
-  hint.classList.add('is-show');
-  btn.addEventListener('click', async ()=>{
-    await enterFullscreen();
-    hint.classList.remove('is-show');
+document.querySelectorAll('.pinApp').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const id=b.getAttribute('data-pin');
+    if(id==='music') show('music');
+    else if(id==='home') show('home');
+    else openDrawer();
   });
-  hint.addEventListener('click', async (e)=>{
-    if(e.target===hint){
-      await enterFullscreen();
-      hint.classList.remove('is-show');
+});
+
+let drawerStartY=0;
+let drawerStartX=0;
+let drawerDragging=false;
+
+const drawerEl=document.getElementById('appDrawer');
+const drawerScroll=document.getElementById('drawerScroll');
+
+function drawerTouchStart(e){
+  const t=e.touches[0];
+  drawerStartY=t.clientY; drawerStartX=t.clientX;
+  drawerDragging=true;
+}
+function drawerTouchMove(e){
+  if(!drawerDragging) return;
+  const t=e.touches[0];
+  const dx=t.clientX-drawerStartX;
+  const dy=t.clientY-drawerStartY;
+
+  if(!drawerOpen && active==='home'){
+    if(Math.abs(dy)>Math.abs(dx) && dy<-42){
+      openDrawer();
+      drawerDragging=false;
     }
-  });
+  }
+  if(drawerOpen){
+    const atTop = (drawerScroll && drawerScroll.scrollTop<=0);
+    if(atTop && Math.abs(dy)>Math.abs(dx) && dy>52){
+      closeDrawer();
+      drawerDragging=false;
+    }
+  }
 }
-setupFullscreen();
+function drawerTouchEnd(){ drawerDragging=false; }
+
+const homeContent=document.getElementById('content');
+if(homeContent){
+  homeContent.addEventListener('touchstart', drawerTouchStart, {passive:true});
+  homeContent.addEventListener('touchmove', drawerTouchMove, {passive:true});
+  homeContent.addEventListener('touchend', drawerTouchEnd, {passive:true});
+}
+if(drawerEl){
+  drawerEl.addEventListener('touchstart', drawerTouchStart, {passive:true});
+  drawerEl.addEventListener('touchmove', drawerTouchMove, {passive:true});
+  drawerEl.addEventListener('touchend', drawerTouchEnd, {passive:true});
+}
+
+// Home bar goes home and closes drawer
+const hb=document.getElementById('homeBar');
+if(hb){
+  hb.addEventListener('click', ()=>{ closeDrawer(); show('home'); });
+}
+
+(function(){
+  const pinned=document.getElementById('pinnedRow');
+  const drawer=document.getElementById('appDrawer');
+  function updatePinnedVis(){
+    if(!pinned) return;
+    pinned.style.display = (active==='home') ? 'grid' : 'none';
+    if(active!=='home') document.body.classList.remove('drawer-open');
+  }
+  setInterval(updatePinnedVis, 300);
+})();
