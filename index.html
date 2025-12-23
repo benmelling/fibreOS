@@ -4,9 +4,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <meta name="theme-color" content="#0a0a10"/>
-  <title>FibreOS Clean v2.9.6</title>
+  <title>FibreOS Clean v2.9.8</title>
   <link rel="manifest" href="manifest.json"/>
-  <link rel="stylesheet" href="styles.css?v=296"/>
+  <link rel="stylesheet" href="styles.css?v=298"/>
 </head>
 <body>
 <div id="app" class="app">
@@ -280,14 +280,16 @@
       <button id="menuBtn" class="capMenu" aria-label="Menu">
         <span class="menuGlyph">≡</span>
       </button>
-      <button id="capSearch" class="capSearch" aria-label="Search">
+      <div class="capSearch" aria-label="Search">
         <span class="mag">🔍</span>
-        <span class="label" id="capSearchLabel">Search Everything</span>
-      </button>
+        <input id="capSearchInput" class="capSearchInput" placeholder="Search Everything" autocomplete="off"/>
+      </div>
     </div>
 
+    <div id="capMiddle" class="capMiddle hidden"></div>
+
     <div class="capBottom">
-      <button id="capTimeBtn" class="capTimeBtn" type="button"><div class="capTime" id="capTime">00:00</div></button>
+      <button id="capTimeBtn" class="capTimeBtn" type="button"><span class="capTime" id="capTime">00:00</span></button>
       <div class="homeBar" aria-hidden="true"></div>
       <button id="capStatusBtn" class="capStatusBtn" type="button"><div class="capStatus">
         <span class="sig sig-cell" title="Cell"><i></i><i></i><i></i><i></i></span>
@@ -296,18 +298,28 @@
           <span class="batIcon"><span class="batFill" id="batFill"></span></span>
           <span class="batPct" id="batPct">--%</span>
         </span>
+      </div></button>
       </div>
-    </div>
 
-    <div id="menuSheet" class="menuSheet hidden">
-      <button class="appIcon" data-go="home"><span class="glyph">🏠</span><span class="txt">Home</span></button>
-      <button class="appIcon" data-go="music"><span class="glyph">🎵</span><span class="txt">Music</span></button>
-      <button class="appIcon" data-go="lock"><span class="glyph">🔒</span><span class="txt">Lock</span></button>
+<div id="menuSheet" class="menuSheet hidden">
+      <button class="appIcon" data-page="home"><span class="glyph">🏠</span><span class="txt">Home</span></button>
+      <button class="appIcon" data-page="foryou"><span class="glyph">✨</span><span class="txt">For You</span></button>
+      <button class="appIcon" data-page="music"><span class="glyph">🎵</span><span class="txt">Music</span></button>
+      <button class="appIcon" data-page="podcasts"><span class="glyph">🎙️</span><span class="txt">Podcasts</span></button>
     </div>
   </footer>
 </div>
 
 <script>window.__COVERS__ = ["assets/cover_00.png", "assets/cover_01.png", "assets/cover_02.png", "assets/cover_03.png", "assets/cover_04.png", "assets/cover_05.png", "assets/cover_06.png", "assets/cover_07.png", "assets/cover_08.png", "assets/cover_09.png", "assets/cover_10.png", "assets/cover_11.png", "assets/cover_12.png", "assets/cover_13.png", "assets/cover_14.png", "assets/cover_15.png"];</script>
-<script src="app.js?v=296"></script>
+<script src="app.js?v=298"></script>
+
+  <div id="fsHint" class="fsHint">
+    <div class="fsCard">
+      <div class="fsTitle">Full screen</div>
+      <div class="fsText">Tap to enter full screen. For the best result, install FibreOS to your Home screen.</div>
+      <button id="fsBtn" class="fsBtn">Enter full screen</button>
+    </div>
+  </div>
+
 </body>
 </html>

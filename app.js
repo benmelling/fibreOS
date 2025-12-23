@@ -96,7 +96,7 @@ function updateCapsuleSize(){
 
 const $=(q,el=document)=>el.querySelector(q);
 const $$=(q,el=document)=>Array.from(el.querySelectorAll(q));
-const SCREENS=["home","music","browser","lock","aod"];
+const SCREENS=["home","music","browser","chat","lock","aod"];
 let active="home";
 let isUnlocked=false;
 let lowPowerMode=false;
@@ -111,8 +111,7 @@ function show(screen){
   });
 
   // Capsule search placeholder + now playing slot
-  const input=document.getElementById("capSearchInput");
-  const capMid=document.getElementById("capMiddle");
+    const input=document.getElementById("capSearchInput");
   if(input){
     input.placeholder = (screen==="music") ? "Search Music" : (screen==="browser" ? "Search / URL" : "Search Everything");
   }
@@ -238,8 +237,8 @@ function updatePinDots(){
   const dots=$$("#pinDots .dot");
   dots.forEach((d,i)=>d.classList.toggle("filled", i<pinEntry.length));
 }
-function setPinMsg(msg){ $("#pinMsg").textContent = msg||""; }
-function resetPin(){ pinEntry=""; updatePinDots(); setPinMsg(""); }
+function setPinMsg(msg){ const el=document.getElementById("pinMsg"); if(el) el.textContent=msg||""; }
+function resetPin(){ pinEntry=""; setPinMsg(""); updateDots(); const ov=document.getElementById("pinOverlay"); if(ov) ov.classList.add("hidden"); const top=document.getElementById("lockTop"); if(top) top.classList.remove("is-blurred"); }
 
 function checkPin(){
   if(DEFAULT_PINS.includes(pinEntry)){
@@ -280,7 +279,6 @@ $$(".appIcon").forEach(btn=>{
     if(sub && active==="music") sub.textContent = page==="home" ? "Home • Music • Podcasts" : (page==="foryou" ? "For You • Music • Podcasts" : (page==="podcasts" ? "Podcasts • For You • Music" : "Music • For You • Podcasts"));
   });
 });
-document.querySelector(".capSearch").addEventListener("click", ()=>{ const i=document.getElementById("capSearchInput"); if(i) i.focus(); });
   else $("#capSearchLabel").animate([{opacity:1},{opacity:.55},{opacity:1}],{duration:520});
 });
 $("#aod").addEventListener("click", ()=>{ resetPin(); show("lock"); });
@@ -561,3 +559,78 @@ show("home");
 
 
 const oc=document.getElementById('openChatGPT'); if(oc){ oc.addEventListener('click', ()=>{ window.open('https://chat.openai.com', '_blank'); }); }
+
+
+document.querySelector('.capSearch').addEventListener('click', ()=>{ const i=document.getElementById('capSearchInput'); if(i) i.focus(); });
+
+// AOD -> Lock
+document.getElementById('aod').addEventListener('click', ()=>{
+  show('lock');
+});
+
+function buildPinPad(){
+  const pad=document.getElementById('pinPad');
+  if(!pad) return;
+  const keys=["1","2","3","4","5","6","7","8","9","⌫","0","OK"];
+  pad.innerHTML = keys.map(k=>`<button class="pinKey" data-k="${k}">${k}</button>`).join("");
+  pad.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const k=b.getAttribute('data-k');
+      if(k==="⌫"){ pinEntry=pinEntry.slice(0,-1); updateDots(); return; }
+      if(k==="OK"){ checkPin(); return; }
+      if(pinEntry.length<4){ pinEntry+=k; updateDots(); if(pinEntry.length===4) checkPin(); }
+    });
+  });
+}
+function updateDots(){
+  const dots=document.querySelectorAll('#pinDots span');
+  dots.forEach((d,i)=>d.classList.toggle('filled', i < pinEntry.length));
+}
+function showPinOverlay(showIt){
+  const ov=document.getElementById('pinOverlay');
+  const top=document.getElementById('lockTop');
+  if(!ov || !top) return;
+  ov.classList.toggle('hidden', !showIt);
+  top.classList.toggle('is-blurred', showIt);
+  if(showIt) buildPinPad();
+}
+document.getElementById('lockClockTap').addEventListener('click', ()=>showPinOverlay(true));
+
+
+
+function isStandalone(){
+  return (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches)
+      || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+      || (navigator.standalone === true);
+}
+
+async function enterFullscreen(){
+  const el=document.documentElement;
+  try{
+    if(el.requestFullscreen) await el.requestFullscreen();
+    else if(el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
+  }catch(e){}
+}
+
+function setupFullscreen(){
+  const hint=document.getElementById('fsHint');
+  const btn=document.getElementById('fsBtn');
+  if(!hint || !btn) return;
+  if(isStandalone()){
+    hint.classList.remove('is-show');
+    return;
+  }
+  // Show hint in browser mode; user can dismiss by entering fullscreen.
+  hint.classList.add('is-show');
+  btn.addEventListener('click', async ()=>{
+    await enterFullscreen();
+    hint.classList.remove('is-show');
+  });
+  hint.addEventListener('click', async (e)=>{
+    if(e.target===hint){
+      await enterFullscreen();
+      hint.classList.remove('is-show');
+    }
+  });
+}
+setupFullscreen();

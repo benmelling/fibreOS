@@ -284,17 +284,6 @@ button{border:0;background:none;color:inherit}
 .capMiddle .npBtns{margin-left:auto}
 
 /* Capsule search input */
-.capSearchInput{
-  flex:1;
-  height:100%;
-  border:0;
-  outline:none;
-  background:transparent;
-  color:rgba(255,255,255,.92);
-  font-size:20px;
-  font-weight:850;
-  letter-spacing:-.01em;
-}
 .capSearchInput::placeholder{color:rgba(255,255,255,.70)}
 
 /* Home dock apps (temporary) */
@@ -500,3 +489,103 @@ button{border:0;background:none;color:inherit}
 
 /* Pager easing while dragging */
 .homePager{ will-change:transform; }
+
+/* Capsule search input (fix) */
+.capSearch{display:flex;align-items:center;gap:12px}
+.capSearchInput{
+  flex:1;
+  height:54px;
+  border:0;
+  outline:none;
+  background:transparent;
+  color:rgba(255,255,255,.92);
+  font-size:20px;
+  font-weight:850;
+  letter-spacing:-.01em;
+}
+.capSearchInput::placeholder{color:rgba(255,255,255,.70)}
+
+/* Keep capsule above home pages but behind lock blur */
+.capsule{z-index:40}
+.screen#lock{position:relative; z-index:60}
+.screen#aod{position:relative; z-index:60}
+
+/* Lock + AOD */
+.aodWrap{
+  position:absolute; inset:0;
+  background:#000;
+  padding:calc(var(--safe-t) + 18px) var(--pad) 0;
+}
+.aodClock{transform:scale(.8); transform-origin:left top}
+.aodHint{position:absolute; left:0; right:0; bottom:calc(var(--safe-b) + 28px); text-align:center; opacity:.5; font-weight:800}
+
+.lockBackdrop{
+  position:absolute; inset:0;
+  background:linear-gradient(165deg, rgba(110,0,60,.75), rgba(0,0,0,.92), rgba(0,90,70,.55));
+  filter:blur(18px);
+  transform:scale(1.12);
+}
+.lockTop{
+  position:relative;
+  padding:calc(var(--safe-t) + 18px) var(--pad) 0;
+}
+.lockClock{margin:0}
+.lockTop.is-blurred{filter:blur(10px); opacity:.9}
+
+.pinOverlay{
+  position:absolute; left:0; right:0;
+  top:50%; transform:translateY(-40%);
+  padding:0 var(--pad);
+  text-align:center;
+}
+.pinTitle{font-size:22px;font-weight:950;opacity:.9}
+.pinDots{display:flex;justify-content:center;gap:10px;margin:14px 0 18px}
+.pinDots span{
+  width:12px;height:12px;border-radius:999px;
+  border:2px solid rgba(255,255,255,.55);
+}
+.pinDots span.filled{background:rgba(255,255,255,.85); border-color:rgba(255,255,255,.85)}
+.pinPad{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:12px;
+}
+.pinKey{
+  height:64px;
+  border-radius:26px;
+  background:#0b0b10;
+  border:1px solid rgba(255,255,255,.10);
+  color:rgba(255,255,255,.92);
+  font-weight:950;
+  font-size:22px;
+}
+.pinMsg{margin-top:14px; font-weight:850; opacity:.75; min-height:22px}
+
+/* Fullscreen hint overlay */
+.fsHint{
+  position:fixed; inset:0; z-index:200;
+  display:none;
+  background:#000;
+  padding:calc(var(--safe-t) + 18px) 18px 18px;
+}
+.fsHint.is-show{display:flex;align-items:center;justify-content:center}
+.fsCard{
+  width:min(420px, 92vw);
+  border-radius:34px;
+  border:1px solid rgba(255,255,255,.10);
+  background:#0b0b10;
+  padding:18px;
+  text-align:center;
+}
+.fsTitle{font-size:26px;font-weight:950}
+.fsText{margin-top:10px;opacity:.70;font-weight:750}
+.fsBtn{
+  margin-top:14px;
+  height:50px;
+  padding:0 18px;
+  border-radius:999px;
+  background:#48f5d2;
+  color:#051015;
+  font-weight:950;
+}
+html, body{ height:100%; overscroll-behavior:none; }
