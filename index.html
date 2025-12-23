@@ -1,316 +1,123 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <meta name="theme-color" content="#0a0a10"/>
-  <title>FibreOS Clean v3.0.0</title>
-  <link rel="manifest" href="manifest.json"/>
-  <link rel="stylesheet" href="styles.css?v=300"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>FibreOS Nav Reset v3.0.1</title>
+  <link rel="manifest" href="manifest.json?v=301">
+  <link rel="stylesheet" href="styles.css?v=301">
 </head>
 <body>
-<div id="app" class="app">
-  <div class="bg" aria-hidden="true"></div>
+  <div id="app" class="app">
+    <div class="bg"></div>
 
-  <main id="content" class="content">
-    <!-- HOME -->
-    <section id="home" class="screen is-active" aria-label="Home">
-      <div id="homePager" class="homePager">
-        <!-- Widgets page (left) -->
-        <div class="homePage" data-page="widgets">
-          <div class="pageHeader">
-            <div class="pageTitle">Widgets</div>
-            <div class="pageSub">Swipe to go Home</div>
-          </div>
-          <div class="pageBody">
-            <div class="solidCard">
-              <div class="cardTitle">Weather widget</div>
-              <div class="cardSub">Huddersfield • <span data-desc>Overcast</span> • <span data-now>7</span>°</div>
-            </div>
-            <div class="solidCard">
-              <div class="cardTitle">Calendar widget</div>
-              <div class="cardSub">Tomorrow 09:00 • DPD Delivery</div>
-            </div>
-            <div class="solidCard">
-              <div class="cardTitle">Now Playing</div>
-              <div class="cardSub">Last Christmas • Wham!</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Main Home (center) -->
-        <div class="homePage is-home" data-page="home">
+    <!-- Horizontal Home Pages (behind everything) -->
+    <div id="homePager" class="homePager" aria-label="Home pages">
+      <div id="homeTrack" class="homeTrack">
+        <section class="homePage" data-page="0">
           <div class="hero">
             <div class="heroClock">
               <div class="hh" data-hh>00</div>
               <div class="mm" data-mm>00</div>
             </div>
             <div class="heroMeta">
-              <div class="day" data-day>Monday</div>
-              <div class="monthRow"><span class="month" data-month>December</span> <span class="date" data-date>22</span></div>
+              <div class="day" id="heroDay">Monday</div>
+              <div class="monthRow">
+                <div class="month" id="heroMonth">December</div>
+                <div class="date" id="heroDate">22</div>
+              </div>
               <div class="weatherRow">
-                <div class="tempNow"><span data-now>7</span>°</div>
-                <div class="descBlock">
-                  <div class="desc" data-desc>Overcast</div>
-                  <div class="range"><span data-hi>9</span>° • <span data-lo>7</span>°</div>
+                <div class="temp" id="heroTemp">7°</div>
+                <div class="wx">
+                  <div class="wxMain" id="heroWx">Overcast</div>
+                  <div class="wxRange" id="heroRange">9° • 7°</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="homeGrid">
-            <div class="tile big">
-              <div class="tileInner dark">
-                <div class="tileTitle">Christmas<br/>Market Fun</div>
-                <div class="tileSub">▶ 2025</div>
-              </div>
-            </div>
-
-            <div class="tile big grad"></div>
-
-            <div class="tile wide agenda">
-              <div class="agendaHead" data-agenda>Monday 22nd December</div>
-              <div class="agendaBody" id="agendaList"></div>
-              <button class="agendaAdd" title="Add">+</button>
-            </div>
+          <!-- Pinned apps (Home) -->
+          <div class="homePinned">
+            <button class="appIcon" data-open="music"><span class="glyph">🎵</span><span class="lbl">Music</span></button>
+            <button class="appIcon" data-open="connect"><span class="glyph">✉️</span><span class="lbl">Connect</span></button>
+            <button class="appIcon" data-open="search"><span class="glyph">🔎</span><span class="lbl">Search</span></button>
+            <button class="appIcon" data-open="widgets"><span class="glyph">🧩</span><span class="lbl">Widgets</span></button>
           </div>
 
-          <div class="homeDock">
-            <button class="dockApp" data-go="music" aria-label="Music"><span class="dIco">🎵</span><span class="dLbl">Music</span></button>
-            <button class="dockApp" data-go="browser" aria-label="Browser"><span class="dIco">🌐</span><span class="dLbl">Browser</span></button>
-            
+          <div class="homeCards">
+            <div class="card big"><div class="t">Christmas<br/>Market Fun</div><div class="s">▶ 2025</div></div>
+            <div class="card big alt"></div>
+            <div class="card wide"><div class="wideTop">Monday 22nd December</div><div class="wideBody">No events today</div></div>
           </div>
-        </div>
+        </section>
 
-        <!-- Connect page (right) -->
-        <div class="homePage" data-page="connect">
-          <div class="pageHeader">
-            <div class="pageTitle">Connect Hub</div>
-            <div class="pageSub">Unified inbox • tap to open chat</div>
-          </div>
-          <div class="pageBody">
-            <button class="chatRow" data-chat="lia">
-              <div class="avatar">L</div>
-              <div class="chatMeta">
-                <div class="chatName">Lia · WhatsApp</div>
-                <div class="chatSnippet">Do you want anything from the shop?</div>
-              </div>
-              <div class="chatBadge">2</div>
-            </button>
-            <button class="chatRow" data-chat="mum">
-              <div class="avatar">M</div>
-              <div class="chatMeta">
-                <div class="chatName">Mum · RCS</div>
-                <div class="chatSnippet">Are you free Sunday?</div>
-              </div>
-              <div class="chatBadge">1</div>
-            </button>
-            <button class="chatRow" data-chat="vp">
-              <div class="avatar">V</div>
-              <div class="chatMeta">
-                <div class="chatName">VP Trade Team · Slack</div>
-                <div class="chatSnippet">New build is on staging.</div>
-              </div>
-              <div class="chatBadge">5</div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
+        <section class="homePage" data-page="1">
+          <div class="pageTitle">Widgets</div>
+          <div class="placeholder">Swipe right-to-left to return • This is just a nav test page.</div>
+        </section>
 
-    <!-- MUSIC -->
-    <section id="music" class="screen" aria-label="Music">
-      <div class="musicHeader">
-        <div class="musicTitle">Music</div>
-        <div class="musicSub">For You • Music • Podcasts</div>
-      </div>
-      <div id="musicGrid" class="musicGrid"></div>
-      <div class="nowPlaying">
-        <div class="npArt" id="npArt"></div>
-        <div class="npText">
-          <div class="npTitle">Last Christmas</div>
-          <div class="npArtist">Wham!</div>
-        </div>
-        <div class="npBtns">
-          <button class="npBtn">⏮</button>
-          <button class="npBtn npPlay">⏸</button>
-          <button class="npBtn">⏭</button>
-        </div>
-      </div>
-      <div class="musicSearchRow">
-        <input class="musicInput" id="musicInput" placeholder="Search Music" autocomplete="off"/>
-      </div>
-    </section>
-
-    <!-- LOCK -->
-    <section id="lock" class="screen" aria-label="Lock screen">
-      <div class="lockBackdrop"></div>
-      <div class="lockLayout">
-        <div class="hero lockHero">
-          <div class="heroClock">
-            <div class="hh" data-hh>00</div>
-            <div class="mm" data-mm>00</div>
-          </div>
-          <div class="heroMeta">
-            <div class="day" data-day>Monday</div>
-            <div class="monthRow"><span class="month" data-month>December</span> <span class="date" data-date>22</span></div>
-            <div class="weatherRow">
-              <div class="tempNow"><span data-now>7</span>°</div>
-              <div class="descBlock">
-                <div class="desc" data-desc>Overcast</div>
-                <div class="range"><span data-hi>9</span>° • <span data-lo>7</span>°</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="pinWrap">
-          <div class="pinTitle">Enter PIN</div>
-          <div class="pinDots" id="pinDots">
-            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          </div>
-          <div class="pinPad" id="pinPad"></div>
-          <div class="pinMsg" id="pinMsg"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- AOD -->
-    <section id="aod" class="screen" aria-label="Always on display">
-      <div class="aodBlack"></div>
-      <div class="lockLayout aodScale">
-        <div class="hero lockHero">
-          <div class="heroClock">
-            <div class="hh" data-hh>00</div>
-            <div class="mm" data-mm>00</div>
-          </div>
-          <div class="heroMeta">
-            <div class="day" data-day>Monday</div>
-            <div class="monthRow"><span class="month" data-month>December</span> <span class="date" data-date>22</span></div>
-            <div class="weatherRow">
-              <div class="tempNow"><span data-now>7</span>°</div>
-              <div class="descBlock">
-                <div class="desc" data-desc>Overcast</div>
-                <div class="range"><span data-hi>9</span>° • <span data-lo>7</span>°</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="aodHint">Tap to wake</div>
-      </div>
-    </section>
-  
-    <!-- NAV TEST PANELS (Home only) -->
-    <div id="panelLeft" class="panel panel-left" aria-label="Widgets panel">
-      <div class="panelCard">
-        <div class="panelTitle">Widgets</div>
-        <div class="panelSub">Swipe right-to-left to close</div>
-        <div class="panelBody">
-          <div class="panelPill">Weather widget</div>
-          <div class="panelPill">Calendar widget</div>
-          <div class="panelPill">Now Playing widget</div>
-        </div>
+        <section class="homePage" data-page="2">
+          <div class="pageTitle">Connect Hub</div>
+          <div class="placeholder">Swipe left-to-right to return • Nav test page.</div>
+        </section>
       </div>
     </div>
 
-    <div id="panelRight" class="panel panel-right" aria-label="Connect panel">
-      <div class="panelCard">
-        <div class="panelTitle">Connect Hub</div>
-        <div class="panelSub">Swipe left-to-right to close</div>
-        <div class="panelBody">
-          <div class="panelPill">Lia · WhatsApp</div>
-          <div class="panelPill">Mum · RCS</div>
-          <div class="panelPill">VP Trade Team · Slack</div>
+    <!-- App Drawer (vertical) -->
+    <div id="drawer" class="drawer" aria-label="App drawer">
+      <div id="drawerSheet" class="drawerSheet">
+        <div class="drawerHandle" aria-hidden="true"></div>
+
+        <!-- Sticky pinned row (matches home pinned) -->
+        <div class="drawerPinned">
+          <button class="appIcon small" data-open="music"><span class="glyph">🎵</span><span class="lbl">Music</span></button>
+          <button class="appIcon small" data-open="connect"><span class="glyph">✉️</span><span class="lbl">Connect</span></button>
+          <button class="appIcon small" data-open="search"><span class="glyph">🔎</span><span class="lbl">Search</span></button>
+          <button class="appIcon small" data-open="widgets"><span class="glyph">🧩</span><span class="lbl">Widgets</span></button>
         </div>
+
+        <div id="drawerGrid" class="drawerGrid"></div>
       </div>
     </div>
 
-    <div id="panelTop" class="panel panel-top" aria-label="Multitasking panel">
-      <div class="panelCard">
-        <div class="panelTitle">Multitasking</div>
-        <div class="panelSub">Swipe bottom-to-top to close</div>
-        <div class="panelBody">
-          <div class="panelPill">Running: Music</div>
-          <div class="panelPill">Running: Search</div>
-          <div class="panelPill">Running: Settings</div>
+    <!-- Capsule (fixed) -->
+    <div id="capsule" class="capsule">
+      <div class="capTop">
+        <button id="capMenuBtn" class="capMenu" aria-label="Menu">≡</button>
+        <div class="capSearch">
+          <span class="capSearchIcon">🔎</span>
+          <input id="capSearchInput" type="text" inputmode="search" autocomplete="off" placeholder="Search Everything" />
         </div>
+      </div>
+
+      <div class="capBottom">
+        <button id="capTimeBtn" class="capTime" aria-label="Time"><span id="capTime">00:00</span></button>
+        <div class="homeBarWrap">
+          <div id="homeBar" class="homeBar" aria-label="Home"></div>
+        </div>
+        <button id="capStatusBtn" class="capStatus" aria-label="Status">
+          <span class="sig">
+            <span class="cell" id="sigCell" data-lvl="4"></span>
+            <span class="wifi" id="sigWifi" data-lvl="3"></span>
+          </span>
+          <span class="battery" id="batteryWrap">
+            <span class="batBody"><span id="batFill" class="batFill"></span></span>
+            <span class="batCap"></span>
+          </span>
+          <span id="batPct" class="batPct">64%</span>
+        </button>
       </div>
     </div>
 
-    <div id="panelBottom" class="panel panel-bottom" aria-label="App drawer panel">
-      <div class="panelCard">
-        <div class="panelTitle">App Drawer</div>
-        <div class="panelSub">Swipe top-to-bottom to close</div>
-        <div class="panelBody drawerGrid">
-          <button class="drawerApp" data-go="music">🎵<span>Music</span></button>
-          <button class="drawerApp" data-go="home">🏠<span>Home</span></button>
-          <button class="drawerApp" data-go="lock">🔒<span>Lock</span></button>
-          <button class="drawerApp" data-go="home">⚙️<span>Settings</span></button>
-          <button class="drawerApp" data-go="home">🔎<span>Search</span></button>
-          <button class="drawerApp" data-go="home">🧩<span>Widgets</span></button>
-        </div>
-      </div>
-    </div>
+    <!-- Debug toast -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  </main>
-
-
-  <!-- NOTIFICATION CENTRE -->
-  <div id="notifSheet" class="sheet hidden" aria-label="Notifications">
-    <div class="sheetHead">
-      <div class="sheetTitle">Notifications</div>
-      <button class="sheetClose" data-close="notifSheet">Close</button>
-    </div>
-    <div class="sheetBody" id="notifBody"></div>
   </div>
 
-  <!-- CONTROL CENTRE -->
-  <div id="controlSheet" class="sheet hidden" aria-label="Controls">
-    <div class="sheetHead">
-      <div class="sheetTitle">Controls</div>
-      <button class="sheetClose" data-close="controlSheet">Close</button>
-    </div>
-    <div class="sheetBody" id="controlBody"></div>
-  </div>
-
-
-  <!-- FIXED FIBRE CAPSULE -->
-  <footer id="capsule" class="capsule" aria-label="Fibre capsule">
-    <div class="capTop">
-      <button id="menuBtn" class="capMenu" aria-label="Menu">
-        <span class="menuGlyph">≡</span>
-      </button>
-      <div class="capSearch" aria-label="Search">
-        <span class="mag">🔍</span>
-        <input id="capSearchInput" class="capSearchInput" placeholder="Search Everything" autocomplete="off"/>
-      </div>
-    </div>
-
-    <div id="capMiddle" class="capMiddle hidden"></div>
-
-    <div class="capBottom">
-      <button id="capTimeBtn" class="capTimeBtn" type="button"><span class="capTime" id="capTime">00:00</span></button>
-      <div class="homeBar" aria-hidden="true"></div>
-      <button id="capStatusBtn" class="capStatusBtn" type="button"><div class="capStatus">
-        <span class="sig sig-cell" title="Cell"><i></i><i></i><i></i><i></i></span>
-        <span class="sig sig-wifi" title="Wi‑Fi"><i></i><i></i><i></i></span>
-        <span class="battery" title="Battery">
-          <span class="batIcon"><span class="batFill" id="batFill"></span></span>
-          <span class="batPct" id="batPct">--%</span>
-        </span>
-      </div></button>
-      </div>
-
-<div id="menuSheet" class="menuSheet hidden">
-      <button class="appIcon" data-page="home"><span class="glyph">🏠</span><span class="txt">Home</span></button>
-      <button class="appIcon" data-page="foryou"><span class="glyph">✨</span><span class="txt">For You</span></button>
-      <button class="appIcon" data-page="music"><span class="glyph">🎵</span><span class="txt">Music</span></button>
-      <button class="appIcon" data-page="podcasts"><span class="glyph">🎙️</span><span class="txt">Podcasts</span></button>
-    </div>
-  </footer>
-</div>
-
-<script>window.__COVERS__ = ["assets/cover_00.png", "assets/cover_01.png", "assets/cover_02.png", "assets/cover_03.png", "assets/cover_04.png", "assets/cover_05.png", "assets/cover_06.png", "assets/cover_07.png", "assets/cover_08.png", "assets/cover_09.png", "assets/cover_10.png", "assets/cover_11.png", "assets/cover_12.png", "assets/cover_13.png", "assets/cover_14.png", "assets/cover_15.png"];</script>
-<script src="app.js?v=300"></script>
+  <script src="app.js?v=301"></script>
 </body>
 </html>
