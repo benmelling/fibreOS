@@ -7,9 +7,9 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>FibreOS Nav Reset v3.0.3</title>
-  <link rel="manifest" href="manifest.json?v=303">
-  <link rel="stylesheet" href="styles.css?v=303">
+  <title>FibreOS Nav Reset v3.0.2</title>
+  <link rel="manifest" href="manifest.json?v=302">
+  <link rel="stylesheet" href="styles.css?v=302">
 </head>
 <body>
   <div id="app" class="app">
@@ -41,11 +41,13 @@
           </div>
 
           <!-- Pinned apps (Home) -->
-          <div class="homePinned">
+          <div id="homePinnedHost">
+            <div id="pinnedRow" class="drawerTopRow">
             <button class="appIcon" data-open="music"><span class="glyph">🎵</span><span class="lbl">Music</span></button>
             <button class="appIcon" data-open="connect"><span class="glyph">✉️</span><span class="lbl">Connect</span></button>
             <button class="appIcon" data-open="search"><span class="glyph">🔎</span><span class="lbl">Search</span></button>
             <button class="appIcon" data-open="widgets"><span class="glyph">🧩</span><span class="lbl">Widgets</span></button>
+          </div>
           </div>
 
           <div class="homeCards">
@@ -118,6 +120,6 @@
 
   </div>
 
-  <script src="app.js?v=303"></script>
+  <script src="app.js?v=302"></script>
 </body>
 </html>
